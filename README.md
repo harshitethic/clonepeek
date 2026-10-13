@@ -56,7 +56,7 @@ Requires Python **3.10+** and no runtime Python dependencies.
 
 ```bash
 # Run directly from GitHub via uv (uv downloads/installs the Python package)
-uvx --from git+https://github.com/harshitethic/clonepeek@v0.2.0 clonepeek /path/to/repo
+uvx --from git+https://github.com/harshitethic/clonepeek@v0.2.1 clonepeek /path/to/repo
 ```
 
 Or install locally:
@@ -126,7 +126,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.13'
-      - run: python -m pip install 'git+https://github.com/harshitethic/clonepeek.git@v0.2.0'
+      - run: python -m pip install 'git+https://github.com/harshitethic/clonepeek.git@v0.2.1'
       - run: clonepeek . --fail-on high
 ```
 
@@ -158,13 +158,22 @@ Stable fingerprints ── optional baseline / diff filter
        └──▶ SARIF 2.1 for security pipelines
 ```
 
-Pure Python standard library at runtime, deterministic rule-based analysis, no dynamic imports from scanned repositories. Version 0.2.0 also limits bytes read per file and refuses named pipes/devices (plus no-follow handling where supported). No need for LLM access or model tokens.
+Pure Python standard library at runtime, deterministic rule-based analysis, no dynamic imports from scanned repositories. Version 0.2.1 also limits bytes read per file and refuses named pipes/devices (plus no-follow handling where supported). No need for LLM access or model tokens.
 
 ## Why this exists
 
 Microsoft documented developer-targeting repository attacks using VS Code workspace automation and other execution paths: [Microsoft Security, February 2026](https://www.microsoft.com/en-us/security/blog/2026/02/24/c2-developer-targeting-campaign/). [BindsNET's September 2026 advisory](https://github.com/BindsNET/bindsnet/security/advisories/GHSA-6f2q-w3r8-xxhj) describes malicious code in a repository that executed on editor open. Those are concrete reasons to inventory execution surfaces before trusting source trees.
 
 ClonePeek is deliberately **narrower** than general-purpose scanners such as [zizmor](https://github.com/zizmorcore/zizmor) (GitHub Actions) or [Snyk Agent Scan](https://github.com/snyk/agent-scan) (agent/MCP security). It does not replace them. Our focus is answering: **“What execution-capable configuration is already sitting in this directory, and when will it activate?”**
+
+## Git configuration trust boundary
+
+We reproduced a subtle risk in the optional changed-file filter: a
+repository-configured Git filesystem monitor could execute during an ordinary
+name-only diff. The v0.2.1 Git invocation prevents that reproducible attack
+and includes an adversarial integration test. Read [the security reproduction
+and fix](docs/GIT-CONFIG-ISOLATION.md) before interpreting static scanning
+as a complete sandbox.
 
 ## Contributing and security
 

@@ -34,12 +34,48 @@ def recognized(relative: str) -> bool:
             (basename in ("mcp.json", ".mcp.json") or basename.endswith(".mcp.json")))
 
 
+def _safe_git_environment() -> dict[str, str]:
+    """Discard Git-specific environment overrides supplied by the host.
+
+    Repository scans should honor neither GIT_CONFIG_* injection from a
+    calling process nor global settings that can dispatch executable Git
+    helpers. Git still reads its own local repository configuration, so
+    changed_paths() also overrides known execution-capable settings.
+    """
+    environment = {
+        key: value for key, value in os.environ.items()
+        if not key.upper().startswith(("GIT_", "SSH_", "LD_", "DYLD_"))
+        and key.upper() not in {"PYTHONPATH", "PYTHONSTARTUP"}
+    }
+    environment["GIT_CONFIG_NOSYSTEM"] = "1"
+    environment["GIT_CONFIG_GLOBAL"] = os.devnull
+    environment["GIT_TERMINAL_PROMPT"] = "0"
+    environment["GIT_PAGER"] = "cat"
+    return environment
+
+
 def changed_paths(root: Path, ref: str) -> set[str]:
     if not re.fullmatch(r"[a-zA-Z0-9_][a-zA-Z0-9_./~^-]*", ref) or ref.startswith("-") or ".." in ref:
         raise ScanError("Invalid git ref; use a branch, tag or SHA")
     try:
-        proc = subprocess.run(["git", "-C", str(root), "diff", "--name-only", "-z", "--diff-filter=ACMR", ref, "--"],
-                              capture_output=True, timeout=15, check=False)
+        # Git repository-local config is untrusted. In particular, ordinary
+        # git diff can invoke core.fsmonitor, even with --name-only. The
+        # configured monitor is code execution, violating passive scanning.
+        argv = [
+            "git",
+            "-c", "core.fsmonitor=false",
+            "-c", f"core.hooksPath={os.devnull}",
+            "-c", "diff.external=",
+            "-c", "protocol.ext.allow=never",
+            "-c", "protocol.file.allow=never",
+            "-C", str(root),
+            "diff", "--no-ext-diff", "--no-textconv",
+            "--name-only", "-z", "--diff-filter=ACMR", ref, "--",
+        ]
+        proc = subprocess.run(
+            argv, capture_output=True, timeout=15, check=False,
+            stdin=subprocess.DEVNULL, env=_safe_git_environment(),
+        )
     except (FileNotFoundError, subprocess.TimeoutExpired) as exc:
         raise ScanError(f"git diff is unavailable: {exc}") from exc
     if proc.returncode != 0:

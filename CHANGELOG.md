@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.1 — 2026-10-14
+
+- Fix unsafe Git filesystem monitor execution during passive changed-file scans.
+- Add adversarial regression for repository-local/global config and inherited Git environment overrides.
+- Document reproduction, mitigation, and remaining Git trust limitations.
+
 ## 0.2.0 — 2026-10-14
 
 - Add Claude Code project command-hook detection with lifecycle triggers and corrected line mapping.
