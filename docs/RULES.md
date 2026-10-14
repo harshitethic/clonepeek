@@ -29,4 +29,14 @@ The redactor masks **some recognizable secrets** in CLI evidence. Because comman
 
 ## Labeled synthetic evaluation
 
-Run `python -m evaluation.evaluate` after installing the package in the checkout. Twelve deliberately hand-authored fixtures at the **high** threshold yield TP=6, FP=1, FN=1, TN=4 (precision and recall both 85.7%). This is a toy corpus **not a statistically valid estimate** of accuracy in real repositories. The reported false positive is a harmless folder-open task, and the false negative is an indirect shell script. See [EVALUATION.md](EVALUATION.md) and the source cases for details.
+Run `python -m evaluation.evaluate` after installing this package. The
+46-case **hand-authored synthetic** corpus reports high-risk TP=15, FP=3,
+FN=2 and TN=26 (precision 83.3%, recall 88.2%) at the `high`
+threshold. Separate per-rule surface-presence counts are available in the
+JSON output, including `null` when a metric is unidentifiable. These
+scores are **not a statistically valid real-world security estimate**.
+
+The corpus intentionally includes harmless VS Code folder-open tasks
+flagged `high`, referenced scripts that are not transitively inspected,
+and Windows PowerShell expression-style fetch-and-execute fixtures.
+See [EVALUATION.md](EVALUATION.md) for exact breakdown and limits.

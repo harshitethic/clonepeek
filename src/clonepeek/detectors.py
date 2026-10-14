@@ -10,6 +10,12 @@ from .formats import line_for, load_json, redact
 from .models import Finding
 
 FETCH_EXEC = re.compile(r"(?is)(?:curl|wget|iwr|invoke-webrequest)\b[^\n|]{0,350}\|\s*(?:sudo\s+)?(?:ba?sh|zsh|sh|python\d?|node|pwsh|powershell|cmd|iex|invoke-expression)\b|\b(?:bash|sh|pwsh|powershell)\s+<(?:\(|\s)*\s*(?:curl|wget)\b")
+# PowerShell download/execute also appears as iex (iwr URI).Content, not
+# just the common iwr URI | iex pipe. This is a narrow static heuristic:
+# it requires an Invoke-WebRequest call nested in Invoke-Expression.
+POWERSHELL_EVAL_FETCH = re.compile(
+    r"(?is)\b(?:iex|invoke-expression)\s*\(\s*(?:iwr|invoke-webrequest)\b[^)]{0,350}\)"
+)
 CREDENTIALS = re.compile(r"(?i)(?:\$\{?(?:[A-Z0-9_]*(?:TOKEN|SECRET|PASSWORD|API_KEY|PRIVATE_KEY|CREDENTIAL)[A-Z0-9_]*)\}?|process\.env|os\.environ|\.env\b|id_rsa\b|\.aws/credentials|\.ssh/)")
 DESTRUCTIVE = re.compile(r"(?i)(?:\brm\s+-[a-z]*r[a-z]*f\b|\brm\s+-[a-z]*f[a-z]*r\b|\bformat\s+[a-z]:|\bmkfs\.|\bdel\s+/[fsq]|\bremove-item\b[^\n]{0,120}-(?:recurse|r)\b)")
 ENCODED = re.compile(r"(?i)(?:base64\s+(?:-d|--decode)|\batob\s*\(|\bfrombase64string\s*\(|\beval\s*\(|\bexec\s*\(|\b(?:powershell|pwsh)(?:\.exe)?\b[^\n]{0,140}-(?:encodedcommand|enc)\b)")
@@ -19,7 +25,7 @@ SHELL = re.compile(r"(?i)\b(?:bash|sh|zsh|pwsh|powershell|cmd(?:\.exe)?)\b")
 
 def assess(command: str, base: str) -> tuple[str, str, str]:
     """Return severity, reason, and recommendation. Heuristics, not proof."""
-    if FETCH_EXEC.search(command):
+    if FETCH_EXEC.search(command) or POWERSHELL_EVAL_FETCH.search(command):
         return "critical", "A network response appears to be piped directly to a command interpreter.", "Remove fetch-and-execute. Download, verify and pin artifacts before running."
     if CREDENTIALS.search(command) and NETWORK.search(command):
         return "critical", "Credentials and a network destination appear together; review for exfiltration.", "Inspect the full command and all referenced files before trusting it."

@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "clonepeek"
-version = "0.2.1"
+version = "0.2.2"
 description = "Know what runs before you open a repository. An offline first-run execution surface auditor."
 readme = "README.md"
 requires-python = ">=3.10"

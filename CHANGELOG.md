@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.2.2 — 2026-10-14
+
+- Expand the labeled, synthetic evaluation corpus from 12 to 46 cases,
+  including benign and suspicious Windows PowerShell scenarios.
+- Fix a reproduced false negative: `iex (iwr ...).Content` and
+  `Invoke-Expression (Invoke-WebRequest ...).Content` now receive
+  critical fetch-and-execute urgency.
+- Add per-rule recognition confusion matrices, fixture support,
+  Wilson 95% intervals and clear invalid/zero-support handling.
+- Preserve measured high-risk false positives and false negatives,
+  explicitly distinguishing review urgency from real-world security.
+- Add corpus validation and CLI regression tests across CI platforms.
+
+
 ## 0.2.1 — 2026-10-14
 
 - Fix unsafe Git filesystem monitor execution during passive changed-file scans.

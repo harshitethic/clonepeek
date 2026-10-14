@@ -56,7 +56,7 @@ Requires Python **3.10+** and no runtime Python dependencies.
 
 ```bash
 # Run directly from GitHub via uv (uv downloads/installs the Python package)
-uvx --from git+https://github.com/harshitethic/clonepeek@v0.2.1 clonepeek /path/to/repo
+uvx --from git+https://github.com/harshitethic/clonepeek@v0.2.2 clonepeek /path/to/repo
 ```
 
 Or install locally:
@@ -92,6 +92,16 @@ Checks are **heuristics**, not malware verdicts. Any lifecycle hook can be legit
 
 See [rule details](docs/RULES.md), [threat model](docs/THREAT_MODEL.md), and the [labeled-fixture evaluation](docs/EVALUATION.md) for exact coverage, measured synthetic false positives, and false negatives.
 
+### Measured limitations, not a security score
+
+The [46-case labeled synthetic evaluation](docs/EVALUATION.md) reports
+15 true positives, 3 false positives, 2 false negatives and 26 true
+negatives at the high-risk threshold (83.3% precision and 88.2% recall
+**on these hand-authored fixtures only**). It also reports per-rule
+execution-surface counts and sample-size uncertainty. The remaining
+false negatives include indirect local scripts; a lower-severity finding
+is **not** proof that referenced code is safe.
+
 ## CI and PR reviews
 
 ```bash
@@ -126,11 +136,11 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.13'
-      - run: python -m pip install 'git+https://github.com/harshitethic/clonepeek.git@v0.2.1'
+      - run: python -m pip install 'git+https://github.com/harshitethic/clonepeek.git@v0.2.2'
       - run: clonepeek . --fail-on high
 ```
 
-**Note:** the example pins the published `v0.2.0` release tag. For stricter supply-chain controls, pin both this package and GitHub Actions to immutable commit SHAs. SARIF upload requires separate Code Scanning permissions and may depend on GitHub repository settings.
+**Note:** the example pins the published `v0.2.2` release tag. For stricter supply-chain controls, pin both this package and GitHub Actions to immutable commit SHAs. SARIF upload requires separate Code Scanning permissions and may depend on GitHub repository settings.
 
 ### Exit codes
 
