@@ -29,6 +29,41 @@ jobs:
 
 After reviewing existing findings, choose `fail-on: high` to block on new high and critical items. For baseline support, generate a reviewed baseline using `clonepeek . --write-baseline .clonepeek-baseline.json` and set the action input `baseline: .clonepeek-baseline.json`.
 
+## Machine-readable JSON report (schema v1)
+
+The published [v1 JSON Schema](schema/scan-report-v1.schema.json) and
+[verified example](schema/scan-report-v1.example.json) describe
+`clonepeek PATH --format json` and the Action's `format: json` output.
+The report's `version` identifies the **scanner package**, not the
+independently versioned report contract.
+
+Add this to an existing job's `steps`:
+
+```yaml
+- uses: actions/checkout@v4
+- uses: harshitethic/clonepeek@v0.5.0
+  with:
+    format: json
+    output: clonepeek-report.json
+- name: Consume count, not source excerpts
+  run: python -c "import json; r=json.load(open('clonepeek-report.json')); print(len(r['findings']))"
+```
+
+Schema v1 uses JSON Schema draft 2020-12. `additionalProperties` is
+deliberately allowed at the root and for individual findings, so future
+optional properties do not break existing integrations. Breaking changes
+to required fields, their types or meaning require a new schema version.
+The schema never freezes the tool's package version. The optional
+developer-only `jsonschema` package can validate reports; standard-library
+regression checks are in `tests/test_report_schema.py`. No runtime
+dependency is required.
+
+**Privacy and limitations:** Evidence may include source excerpts and
+still-sensitive information despite best-effort redaction. Do not publish
+full CI reports or upload artifacts without reviewing and sanitizing them.
+A conforming report is not proof of scan completeness or repository safety;
+`findings: []` can occur for unsupported execution surfaces.
+
 ## Inputs
 
 | Input | Default | Meaning |
