@@ -34,7 +34,8 @@ jobs:
           import json, os
           from pathlib import Path
           report = json.loads(Path(os.environ['REPORT']).read_text())
-          assert report['runs'][0]['tool']['driver']['version'] == '0.5.0'
+          expected_version = json.loads(Path('docs/schema/scan-report-v1.example.json').read_text())['version']
+          assert report['runs'][0]['tool']['driver']['version'] == expected_version
           assert len(report['runs'][0]['results']) == 2
           assert (os.environ['FINDINGS'], os.environ['CRITICAL'], os.environ['NEW_FINDINGS']) == ('2', '1', '2')
           print('Composite action, metadata outputs and SARIF report passed')
