@@ -97,9 +97,37 @@ def load_json(text: str, jsonc: bool = False):
 
 
 def redact(value: str, length: int = 240) -> str:
-    """Evidence contains hints, never intentionally prints known token shapes."""
+    """Best-effort masking in scanner evidence; review reports before sharing."""
     value = re.sub(r"(?i)(gh[pousr]_[A-Za-z0-9_]{12,}|github_pat_[A-Za-z0-9_]{12,}|sk-[A-Za-z0-9_-]{16,}|AKIA[0-9A-Z]{16})", "[REDACTED]", value)
-    value = re.sub(r"(?i)(password|token|api[_-]?key|secret)\s*[=:]\s*(['\"]?)[^\s,;\"']+", r"\1=[REDACTED]", value)
+
+    # Quoted assignments may contain spaces; mask the whole credential.
+    value = re.sub(
+        r"""(?i)\b(?P<key>password|token|api[_-]?key|secret)\s*[=:]\s*(?P<quote>['"])(?P<secret>.*?)(?P=quote)""",
+        lambda m: f"{m['key']}={m['quote']}[REDACTED]{m['quote']}",
+        value,
+    )
+    value = re.sub(
+        r"""(?i)\b(?P<key>password|token|api[_-]?key|secret)\s*[=:]\s*(?P<secret>[^\s,;'"\\]+)""",
+        lambda m: f"{m['key']}=[REDACTED]",
+        value,
+    )
+
+    # Agent/MCP launch arguments often pass credentials as a separate value.
+    option = r"--(?:api[-_]?key|access[-_]?token|auth[-_]?token|client[-_]?secret|password|passwd|secret|token)"
+    value = re.sub(
+        rf"""(?i)(?P<flag>{option})(?P<sep>\s+|=)(?P<quote>['"])(?P<secret>.*?)(?P=quote)""",
+        lambda m: f"{m['flag']}{m['sep']}{m['quote']}[REDACTED]{m['quote']}",
+        value,
+    )
+    value = re.sub(
+        rf"""(?i)(?P<flag>{option})(?P<sep>\s+|=)(?P<secret>[^\s,;'"\\]+)""",
+        lambda m: f"{m['flag']}{m['sep']}[REDACTED]",
+        value,
+    )
+    value = re.sub(
+        r"""(?i)(\bauthorization\s*[:=]\s*bearer\s+)([^\s"';,]+)""",
+        r"\1[REDACTED]", value,
+    )
     value = re.sub(r"https?://[^\s/@]+:[^\s/@]+@", "https://[REDACTED]@", value)
     value = value.replace("\r", " ").replace("\n", " ").strip()
     return value[:length] + ("…" if len(value) > length else "")
