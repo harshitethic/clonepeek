@@ -32,3 +32,14 @@ Only explicit literal `.sh` references from recognized executable configuration 
 ### Changed-file inspection
 
 With `--changed-since REF`, ClonePeek checks changed recognized configurations and, when a tracked `.sh` script changes, also examines unchanged configurations for direct literal references to it. Only findings from the modified script are returned in that latter case. Untracked files are excluded by Git's diff behavior. Changes to scripts referenced only dynamically or through unsupported languages remain out of scope.
+
+
+### Reporting sensitive configuration values
+
+ClonePeek masks several common credential patterns in findings, including
+inline key assignments, credential-bearing CLI options, and Bearer
+authorization headers. **This is best-effort masking, not a secrets scanner**:
+unknown formats, custom option names, and non-command metadata can still
+contain sensitive values. Review JSON, SARIF, and text reports before
+publishing them or uploading CI artifacts. Run the scanner against untrusted
+repos only from a separate trusted environment.
