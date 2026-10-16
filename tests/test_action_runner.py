@@ -10,6 +10,7 @@ import tempfile
 import unittest
 
 from action_runner import perform
+from clonepeek import __version__
 
 EXAMPLES = Path(__file__).resolve().parents[1] / "examples" / "indirect-script"
 
@@ -61,7 +62,7 @@ class CompositeActionTests(unittest.TestCase):
             self.assertEqual(code, 0)
             self.assertNotIn("curl https://", stdout)
             report = json.loads(dest.read_text())
-            self.assertEqual(report["version"], "0.5.0")
+            self.assertEqual(report["version"], __version__)
             self.assertEqual(len(report["findings"]), 2)
             self.assertTrue(all(x["status"] == "new" for x in report["findings"]))
 
@@ -69,7 +70,7 @@ class CompositeActionTests(unittest.TestCase):
         code, stdout, stderr = self.run_action({"CLONEPEEK_INPUT_FORMAT": "sarif"})
         self.assertEqual(code, 0, stderr)
         report = json.loads(stdout)
-        self.assertEqual(report["runs"][0]["tool"]["driver"]["version"], "0.5.0")
+        self.assertEqual(report["runs"][0]["tool"]["driver"]["version"], __version__)
         self.assertEqual(len(report["runs"][0]["results"]), 2)
 
     def test_empty_directory_zero_findings(self):
@@ -114,10 +115,22 @@ class CompositeActionTests(unittest.TestCase):
             })
             self.assertEqual(code, 0, err)
 
+    def test_release_version_is_consistent_with_metadata_and_public_examples(self):
+        root = Path(__file__).resolve().parents[1]
+        project = (root / "pyproject.toml").read_text(encoding="utf-8")
+        sample = json.loads((root / "docs/schema/scan-report-v1.example.json").read_text(encoding="utf-8"))
+        landing = (root / "docs/index.html").read_text(encoding="utf-8")
+        guide = (root / "docs/GITHUB-ACTION.md").read_text(encoding="utf-8")
+        self.assertIn(f'version = "{__version__}"', project)
+        self.assertEqual(sample["version"], __version__)
+        self.assertIn(f'"softwareVersion":"{__version__}"', landing)
+        self.assertIn(f"clonepeek@v{__version__}", landing)
+        self.assertIn(f"clonepeek@v{__version__}", guide)
+
     def test_readme_contains_direct_action_usage(self):
         root = Path(__file__).resolve().parents[1]
         readme = (root / "README.md").read_text(encoding="utf-8")
-        self.assertIn("uses: harshitethic/clonepeek@v0.5.0", readme)
+        self.assertIn(f"uses: harshitethic/clonepeek@v{__version__}", readme)
         self.assertTrue((root / "action.yml").is_file())
 
 

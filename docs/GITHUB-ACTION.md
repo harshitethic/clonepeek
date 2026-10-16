@@ -1,4 +1,4 @@
-# ClonePeek composite GitHub Action (v0.5.0)
+# ClonePeek composite GitHub Action (v0.5.1)
 
 The repository-root [action.yml](../action.yml) makes ClonePeek a reusable composite GitHub Action. It **reads configuration files and bounded local shell references, not executes any repository code**. The Python runtime is set up by GitHub's Python setup action, then ClonePeek runs directly from the trusted action checkout, with no pip installation or dependencies from the repository being audited.
 
@@ -18,7 +18,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - uses: harshitethic/clonepeek@v0.5.0
+      - uses: harshitethic/clonepeek@v0.5.1
         id: clonepeek
         with:
           path: .
@@ -41,7 +41,7 @@ Add this to an existing job's `steps`:
 
 ```yaml
 - uses: actions/checkout@v4
-- uses: harshitethic/clonepeek@v0.5.0
+- uses: harshitethic/clonepeek@v0.5.1
   with:
     format: json
     output: clonepeek-report.json
@@ -95,4 +95,4 @@ The public v0.5.0 composite action also ran successfully in a [separate RepoPilo
 
 The [composite action CI workflow](../.github/workflows/composite-action.yml) invokes the actual action with `uses: ./` on Ubuntu, macOS and Windows, verifies reported outputs and SARIF content, and separately checks expected severity-threshold failure. [Adapter tests](../tests/test_action_runner.py) cover inert fixtures, formats, baseline behavior, invalid options and shell metacharacters.
 
-For stricter release immutability, replace the tag `@v0.5.0` in consumer workflows with the tag's immutable Git commit SHA after verifying it. Marketplace listing and independent external adoption are separate from having a valid `action.yml`.
+For stricter release immutability, replace the tag `@v0.5.1` in consumer workflows with the tag's immutable Git commit SHA after verifying it. Marketplace listing and independent external adoption are separate from having a valid `action.yml`.

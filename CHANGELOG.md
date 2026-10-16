@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.5.1 — 2026-10-16
+
+- Improve best-effort evidence masking for common credential-bearing CLI flags, quoted assignments and HTTP Bearer headers in text, JSON, and SARIF output. **Review reports before sharing:** custom secret formats can still leak.
+- Publish machine-readable versioned JSON scan-report v1 schema and an inert example for CI integration. Schema version is independent of package version and does not establish scanner accuracy.
+- Add nine targeted regression tests across redaction and JSON contract / Action output checks; preserve a standard-library-only runtime.
+- Refresh CLI, reusable GitHub Action and website installation instructions to the patched tag, without rewriting historical v0.5.0 reproducibility records.
+
 ## 0.5.0 — 2026-10-15
 
 - Ship an install-free composite GitHub Action that runs the Python scanner from the versioned action checkout against the user’s repository.

@@ -31,12 +31,12 @@ A mundane command can still be important. For example, a `postinstall` script th
 
 ## 3. Perform a passive scan
 
-ClonePeek is an MIT-licensed, standard-library-only Python CLI. The published **v0.5.0** release audits modeled execution configuration without executing the scanned repository's code:
+ClonePeek is an MIT-licensed, standard-library-only Python CLI. The published **v0.5.1** release audits modeled execution configuration without executing the scanned repository's code:
 
 ```sh
 # Install/run the trusted scanner from its versioned GitHub source.
 # This first installation step needs network access; the scan itself does not.
-uvx --from git+https://github.com/harshitethic/clonepeek@v0.5.0 clonepeek /path/to/unfamiliar-repo
+uvx --from git+https://github.com/harshitethic/clonepeek@v0.5.1 clonepeek /path/to/unfamiliar-repo
 ```
 
 On any finding, read its **trigger**, source **path and line**, the exact evidence, and the review advice. The tool can follow one hop into explicitly referenced local `.sh` scripts using strict read and path limits; it never executes them. Review both the parent configuration and any referenced script manually.
@@ -65,7 +65,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - uses: harshitethic/clonepeek@v0.5.0
+      - uses: harshitethic/clonepeek@v0.5.1
         with:
           changed-since: ${{ github.event.pull_request.base.sha }}
           fail-on: none
@@ -94,4 +94,4 @@ For its existing modeled surfaces, false positives and false negatives are docum
 
 Which first-run config files would you add to this checklist? Do you have an **inert, redacted** fixture where an execution trigger is missed or overclassified? [File a small reproducible issue](https://github.com/harshitethic/clonepeek/issues/14) or open a PR with a test. No credentials, live malicious URLs, or claims of third-party compromise, please.
 
-**Project:** [harshitethic/clonepeek](https://github.com/harshitethic/clonepeek) · **Release:** [v0.5.0](https://github.com/harshitethic/clonepeek/releases/tag/v0.5.0) · **License:** MIT
+**Project:** [harshitethic/clonepeek](https://github.com/harshitethic/clonepeek) · **Release:** [v0.5.1](https://github.com/harshitethic/clonepeek/releases/tag/v0.5.1) · **License:** MIT
