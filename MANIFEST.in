@@ -1,0 +1,10 @@
+# Include the security review instructions, CLI demonstrations, JSON contract,
+# evaluation scripts and GitHub Action adapter in downloadable source archives.
+include CHANGELOG.md CONTRIBUTING.md CODE_OF_CONDUCT.md SECURITY.md LICENSE
+include action.yml action_runner.py
+recursive-include docs *
+recursive-include examples *
+recursive-include evaluation *
+recursive-include assets *
+recursive-include .github/workflows *.yml
+global-exclude __pycache__ *.py[cod] .DS_Store
