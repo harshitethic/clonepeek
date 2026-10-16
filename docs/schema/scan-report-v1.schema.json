@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://harshitethic.github.io/clonepeek/schema/scan-report-v1.schema.json",
+  "title": "ClonePeek scan report v1",
+  "description": "Versioned JSON report contract, independent of scanner package version.",
+  "type": "object",
+  "required": ["tool", "version", "scanned", "skipped", "findings"],
+  "properties": {
+    "tool": {"const": "clonepeek"},
+    "version": {"type": "string", "minLength": 1, "description": "Scanner version, not schema version."},
+    "scanned": {"type": "integer", "minimum": 0},
+    "skipped": {"type": "integer", "minimum": 0},
+    "findings": {"type": "array", "items": {"$ref": "#/$defs/finding"}, "description": "Empty findings do not establish safety."}
+  },
+  "additionalProperties": true,
+  "$defs": {
+    "finding": {
+      "type": "object",
+      "required": ["rule", "severity", "path", "line", "trigger", "title", "evidence", "why", "advice", "fingerprint", "status"],
+      "properties": {
+        "rule": {"type": "string", "minLength": 1},
+        "severity": {"type": "string", "enum": ["info", "low", "medium", "high", "critical"]},
+        "path": {"type": "string"},
+        "line": {"type": "integer", "minimum": 1, "description": "1-based source line hint."},
+        "trigger": {"type": "string"},
+        "title": {"type": "string"},
+        "evidence": {"type": "string", "description": "Best-effort-masked source excerpt; could contain sensitive content."},
+        "why": {"type": "string"},
+        "advice": {"type": "string"},
+        "fingerprint": {"type": "string", "pattern": "^[a-f0-9]{24}$"},
+        "status": {"type": "string", "enum": ["known", "new"], "description": "Known is not synonymous with safe."}
+      },
+      "additionalProperties": true
+    }
+  }
+}
