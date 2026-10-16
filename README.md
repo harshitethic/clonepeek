@@ -90,6 +90,8 @@ PYTHONPATH=src python -m clonepeek examples/suspicious
 
 > For an untrusted repository, clone it without opening it in your editor or installing dependencies, then scan its directory from a separate trusted terminal. A `git clone` can still interact with your own Git settings and hooks; ClonePeek is **not** a sandbox.
 
+For integrations, ClonePeek publishes a [versioned JSON report schema](docs/schema/scan-report-v1.schema.json), [example](docs/schema/scan-report-v1.example.json), and [GitHub Action JSON workflow](docs/GITHUB-ACTION.md#machine-readable-json-report-schema-v1). Validating the schema does not establish that a repository is safe.
+
 ## What it finds
 
 | Surface | Example | When it can execute | Rule |
