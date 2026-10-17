@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#0c101b">
+<meta name="description" content="A practical, non-executing checklist for npm lifecycle scripts, VS Code folder-open tasks, devcontainers, Cursor, Claude Code and MCP process configuration.">
+<link rel="canonical" href="https://harshitethic.github.io/clonepeek/articles/repository-hooks-before-you-trust.html">
+<link rel="icon" href="../icon.svg" type="image/svg+xml">
+<meta property="og:type" content="article">
+<meta property="og:title" content="6 repository hooks to inspect before trusting a repo">
+<meta property="og:description" content="A practical, non-executing checklist for npm lifecycle scripts, VS Code folder-open tasks, devcontainers, Cursor, Claude Code and MCP process configuration.">
+<meta property="og:image" content="https://harshitethic.github.io/clonepeek/og.png">
+<meta property="og:url" content="https://harshitethic.github.io/clonepeek/articles/repository-hooks-before-you-trust.html">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"6 repository hooks to inspect before trusting a GitHub project","description":"A practical, non-executing checklist for npm lifecycle scripts, VS Code folder-open tasks, devcontainers, Cursor, Claude Code and MCP process configuration.","author":{"@type":"Person","name":"Harshit Sharma","url":"https://github.com/harshitethic"},"datePublished":"2026-10-17","dateModified":"2026-10-17","publisher":{"@type":"Organization","name":"ClonePeek","url":"https://harshitethic.github.io/clonepeek/"},"mainEntityOfPage":"https://harshitethic.github.io/clonepeek/articles/repository-hooks-before-you-trust.html","isAccessibleForFree":true}</script>
+<title>6 repository hooks to inspect before trusting a GitHub project | ClonePeek</title>
+<style>
+:root{color-scheme:dark;--bg:#0c101b;--ink:#eef1fb;--muted:#a3afc8;--accent:#c0abff;--border:#303951;--code:#80eadc}
+*{box-sizing:border-box} html{scroll-behavior:smooth}
+body{margin:0;color:var(--ink);background:var(--bg);font:16px/1.84 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+a{color:var(--accent);text-underline-offset:3px}
+a:hover{color:#e1d6ff}a:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+header{border-bottom:1px solid #ffffff21;background:#121828;position:sticky;top:0;z-index:5}
+nav{max-width:1080px;margin:auto;min-height:66px;padding:0 24px;display:flex;align-items:center;justify-content:space-between;gap:20px}
+nav a{text-decoration:none;font-size:14px} nav a:first-child{font-size:21px;font-weight:800;letter-spacing:-.06em;color:var(--ink)}
+nav span{color:var(--code)} nav .links{display:flex;gap:20px;flex-wrap:wrap}
+main{max-width:780px;margin:0 auto;padding:85px 24px 110px}
+.kicker{font-weight:750;letter-spacing:.14em;text-transform:uppercase;font-size:12px;color:var(--code)}
+h1{font-size:clamp(44px,6.5vw,72px);line-height:1.08;letter-spacing:-.067em;margin:18px 0 25px;font-weight:780}
+h2{font-size:clamp(26px,3vw,33px);letter-spacing:-.04em;line-height:1.2;margin:56px 0 16px}
+h3{font-size:20px;letter-spacing:-.025em;margin:29px 0 10px}
+p{margin:0 0 21px;color:#bdc7dc}strong{color:var(--ink)}
+.lead{font-size:19px;color:#c5cde2;line-height:1.72}
+.byline{color:#93a2be;font-size:13px;margin-top:28px;padding-bottom:30px;border-bottom:1px solid var(--border)}
+pre{padding:23px;overflow-x:auto;white-space:pre;font:13px/1.75 ui-monospace,SFMono-Regular,Consolas,monospace;background:#101829;border:1px solid #39445d;border-radius:12px;color:#c3f0e4}
+code{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:.91em;color:#d0bcff}
+pre code{color:inherit;font-size:1em}
+ul{color:#bdc7dc;padding-left:24px;margin:0 0 25px}li{padding-left:3px;margin-bottom:10px}
+aside{padding:20px 23px;border-left:3px solid #9582db;margin:28px 0;background:#181d30}
+aside p:last-child{margin-bottom:0}
+hr{border:0;border-top:1px solid var(--border);margin:60px 0 35px}
+.cta{border:1px solid #5c508b;background:linear-gradient(145deg,#26233f,#171c2c);padding:28px;border-radius:16px;margin-top:45px}
+.cta h2{margin:0 0 12px}
+.cta a{display:inline-block;padding:10px 17px;margin:8px 10px 0 0;border:1px solid #8d7bc9;border-radius:10px;text-decoration:none;font-size:14px;font-weight:680}
+footer{border-top:1px solid var(--border);color:#8796b0;text-align:center;padding:28px 20px;font-size:13px}
+@media(max-width:620px){main{padding-top:57px}nav .links a:nth-child(1){display:none}pre{padding:15px;font-size:12px}}
+</style>
+</head>
+<body>
+<header><nav aria-label="Navigation"><a href="../">clonepeek<span>.</span></a><div class="links"><a href="../">Home</a><a href="https://github.com/harshitethic/clonepeek/blob/main/docs/THREAT_MODEL.md">Threat model</a><a href="https://github.com/harshitethic/clonepeek">GitHub ↗</a></div></nav></header>
+
+<main>
+<div class="kicker">Practical guide / Open-source repository hygiene</div>
+<h1>Six hooks to check <em>before</em> you trust a repository.</h1>
+<p class="lead">Opening a folder, installing dependencies, attaching a coding agent, or launching a devcontainer can activate configuration-defined commands. Here is a short checklist for finding the known entry points before you decide what to trust.</p>
+<div class="byline">By Harshit Sharma, ClonePeek maintainer · 17 October 2026 · 5-minute read</div>
+
+<h2 id="scope">Start with the scope, not a security score</h2>
+<p>Repository configuration can describe what a development tool <em>may</em> run later. Seeing a command in a file is not proof that it executed, that the author is malicious, or that the project is compromised. Triggers depend on individual package-manager, editor, trust and agent settings.</p>
+<p>Review an unfamiliar checkout from a separate trusted terminal <strong>before</strong> installing its packages, opening it as a trusted editor workspace, or starting a coding agent. Even cloning is not a sandbox: your local Git configuration and environment may affect Git operations.</p>
+
+<h2 id="npm">1. Package-manager lifecycle scripts</h2>
+<p>Look in <code>package.json</code>, especially the <code>scripts</code> keys <code>preinstall</code>, <code>install</code>, <code>postinstall</code>, <code>prepare</code> and <code>prepack</code>. Some package-manager operations can invoke these automatically. A normal lifecycle command is not inherently suspicious; check the script and the programs it calls.</p>
+<pre><code>{
+  "scripts": {
+    "postinstall": "node scripts/verify-setup.js"
+  }
+}</code></pre>
+<p>This is an <strong>inert illustration</strong>. Do not execute it to inspect it. ClonePeek models these npm surfaces and follows one statically identifiable hop into literal local <code>.sh</code> references, but it does not analyze arbitrary JavaScript imports or recursive script execution.</p>
+
+<h2 id="vscode">2. VS Code automatic folder-open tasks</h2>
+<p>Inspect <code>.vscode/tasks.json</code> for tasks that declare <code>runOptions.runOn: folderOpen</code>. Whether a task runs when the folder is opened depends on workspace trust and automatic-task settings. Read the command, task arguments and referenced files before accepting the workspace.</p>
+<pre><code>{
+  "version": "2.0.0",
+  "tasks": [{
+    "label": "Example setup task",
+    "type": "shell",
+    "command": "echo review-me",
+    "runOptions": {"runOn": "folderOpen"}
+  }]
+}</code></pre>
+<p>The <code>echo</code> value is deliberately harmless; this snippet exists to demonstrate the configuration shape, not to perform a setup.</p>
+
+<h2 id="devcontainer">3. Devcontainer lifecycle</h2>
+<p>Review <code>.devcontainer/devcontainer.json</code> for <code>initializeCommand</code>, <code>onCreateCommand</code>, <code>postCreateCommand</code>, <code>postStartCommand</code> and <code>postAttachCommand</code>. Those correspond to different phases of creating, starting and attaching to a development environment. Devcontainer features can also introduce build-time setup. An isolated container is not a blanket guarantee of safety when it has mounts, credentials or network access.</p>
+
+<h2 id="agent">4. Claude Code command hooks</h2>
+<p>Look at project files such as <code>.claude/settings.json</code> and <code>.claude/settings.local.json</code>. Command hooks can be attached to events such as <code>SessionStart</code> or <code>PostToolUse</code>. Activation depends on the agent and its configuration. Treat instructions, tools and automatic commands from a new project as untrusted until reviewed.</p>
+
+<h2 id="cursor">5. Cursor workspace and agent hooks</h2>
+<p>Look for <code>.cursor/hooks.json</code>, including event definitions such as <code>workspaceOpen</code> and <code>afterFileEdit</code>. Read <em>what will be invoked, when, and by which process</em>. A passive review tool should never trigger the hook merely to discover its output.</p>
+
+<h2 id="mcp">6. Local MCP process launch configuration</h2>
+<p>Review the local MCP configuration your agent or editor may consume, particularly each <code>mcpServers</code> entry with a <code>command</code>, <code>args</code>, environment variables and filesystem references. These are process-launch instructions, not necessarily running servers. They may take effect only when the client enables or approves them.</p>
+
+<h2 id="scan">Run a passive review in a trusted terminal</h2>
+<p>I maintain <a href="https://github.com/harshitethic/clonepeek">ClonePeek</a>, a small MIT-licensed Python CLI and GitHub Action for enumerating the modeled entry points above. The scan reads bounded configuration files and does <strong>not</strong> run the target repository's scripts. Downloading/installing the scanner itself uses a network connection; the scan itself operates offline.</p>
+<pre><code>uvx --from git+https://github.com/harshitethic/clonepeek@v0.5.1 clonepeek /path/to/repo</code></pre>
+<p>For an inert demonstration, use the bundled <a href="https://github.com/harshitethic/clonepeek/tree/main/examples/agent-hooks">agent-hooks fixture</a>. Review the <strong>trigger</strong>, source <strong>path and line</strong>, example <strong>evidence</strong>, and suggested review advice for each finding. None of the example commands needs to run.</p>
+<p>You can also start with this non-blocking PR workflow:</p>
+<pre><code>name: Review execution hooks
+on: [pull_request]
+permissions:
+  contents: read
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: harshitethic/clonepeek@v0.5.1
+        with:
+          path: .
+          fail-on: none</code></pre>
+<p>The <a href="https://github.com/harshitethic/clonepeek/blob/main/docs/GITHUB-ACTION.md">Action integration guide</a> explains thresholds, baselines, JSON/SARIF and changed-file mode.</p>
+
+<h2 id="limits">What a clean result does <em>not</em> mean</h2>
+<ul>
+<li><strong>No scanner can promise a safe repository.</strong> ClonePeek deliberately omits dynamic references, many language/build execution paths and other unsupported tools.</li>
+<li><strong>Severity means review urgency.</strong> Common, benign setup tasks can still receive high heuristic severity, while obfuscated or unsupported paths can be missed.</li>
+<li><strong>Baseline does not equal approval.</strong> A finding marked known is still an execution-capable surface; it merely matched your stored fingerprint.</li>
+<li><strong>Scan reports can contain sensitive content.</strong> Redaction is best effort. Review and sanitize source excerpts before posting an artifact or CI comment publicly.</li>
+<li><strong>Git operations deserve a boundary review too.</strong> ClonePeek's <a href="./git-fsmonitor-passive-scanning.html">Git fsmonitor case study</a> documents a prior bug where a passive-looking diff invoked a configured helper. This was fixed with regression tests; it is not a sandbox guarantee.</li>
+</ul>
+
+<div class="cta">
+<h2>Help improve the checklist</h2>
+<p>Have a harmless repository hook that is missing or misclassified? A tiny inert reproduction and clear expected trigger help more than generic praise. The public <a href="https://github.com/harshitethic/clonepeek/blob/main/docs/THREAT_MODEL.md">threat model</a> lists blind spots, and the <a href="https://github.com/harshitethic/clonepeek/blob/main/docs/EVALUATION.md">labeled synthetic evaluation</a> is explicitly <strong>not</strong> independent real-world accuracy evidence.</p>
+<a href="https://github.com/harshitethic/clonepeek/issues/14">Contribute an inert field test ↗</a>
+<a href="https://github.com/harshitethic/clonepeek/releases/tag/v0.5.1">Get the stable release ↗</a>
+<a href="../">Explore ClonePeek ↗</a>
+</div>
+</main>
+<footer>ClonePeek engineering notes · MIT project · No analytics or tracking on this page</footer>
+</body>
+</html>

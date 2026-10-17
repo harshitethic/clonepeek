@@ -143,7 +143,7 @@
     <a class="primary" href="#install">Run a passive audit <span aria-hidden="true">↗</span></a>
     <a class="secondary" href="#demo">See the real demo <span aria-hidden="true">↓</span></a>
   </div>
-  <div class="cred"><span>◈ <strong>64 automated tests</strong></span><span>◈ <strong>Windows · Linux · macOS CI</strong></span><span>◈ <strong>Python 3.10+</strong></span><span>◈ <strong>Zero runtime dependencies</strong></span></div>
+  <div class="cred"><span>◈ <strong>Cross-platform test suite</strong></span><span>◈ <strong>Windows · Linux · macOS CI</strong></span><span>◈ <strong>Python 3.10+</strong></span><span>◈ <strong>Zero runtime dependencies</strong></span></div>
 </div>
 <section id="demo" class="wrap" aria-labelledby="demo-title">
   <div class="section-head"><div><div class="overline">01 / Real scanner output</div><h2 id="demo-title">See the hooks. Not just the files.</h2></div><p>These are pre-recorded outputs from versioned, synthetic examples in the repository. Switching tabs does not scan or execute anything.</p></div>
@@ -202,9 +202,10 @@
 <section class="wrap" id="evidence">
   <div class="section-head"><div><div class="overline">04 / Verified, not inflated</div><h2>Built for skeptical developers.</h2></div><p>Source links and reproducible evidence, with what was—and wasn't—tested.</p></div>
   <div class="proof">
-    <div class="proof-card"><span class="eyebrow">Evidence, with limits</span><h3 style="font-size:26px;margin:22px 0 12px;letter-spacing:-.04em">74 tests. Three OSes. Two pinned public config snapshots.</h3><p>CI tested the GitHub Action on Windows, Linux and macOS. A maintainer-run <strong>separate-repository</strong> smoke test checked exact Git blobs and found <strong>7 Cursor hook commands</strong> and <strong>2 VS Code folder-open tasks</strong>.</p><p style="margin-bottom:0">These are intentionally selected test cases—not representative accuracy, independent adoption, or a malware verdict.</p></div>
+    <div class="proof-card"><span class="eyebrow">Evidence, with limits</span><h3 style="font-size:26px;margin:22px 0 12px;letter-spacing:-.04em">Cross-platform CI. Three OSes. Two pinned public config snapshots.</h3><p>CI tested the GitHub Action on Windows, Linux and macOS. A maintainer-run <strong>separate-repository</strong> smoke test checked exact Git blobs and found <strong>7 Cursor hook commands</strong> and <strong>2 VS Code folder-open tasks</strong>.</p><p style="margin-bottom:0">These are intentionally selected test cases—not representative accuracy, independent adoption, or a malware verdict.</p></div>
     <div class="proof-list">
       <a href="./articles/git-fsmonitor-passive-scanning.html">How a read-only Git scan triggered repo code <span aria-hidden="true">↗</span></a>
+      <a href="./articles/repository-hooks-before-you-trust.html">Six repo hooks to review before trusting a project <span aria-hidden="true">↗</span></a>
       <a href="https://github.com/harshitethic/clonepeek/blob/main/docs/CROSS-REPO-SMOKE.md">Cross-repository proof <span aria-hidden="true">↗</span></a>
       <a href="https://github.com/harshitethic/clonepeek/actions/workflows/composite-action.yml">Real reusable-action CI <span aria-hidden="true">↗</span></a>
       <a href="https://github.com/harshitethic/clonepeek/blob/main/docs/EVALUATION.md">Synthetic evaluation and error cases <span aria-hidden="true">↗</span></a>
