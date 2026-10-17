@@ -1,0 +1,25 @@
+<?xml version='1.0' encoding='utf-8'?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>ClonePeek — engineering notes</title>
+    <link>https://harshitethic.github.io/clonepeek/</link>
+    <description>Original engineering writeups and reproducible safety notes on passive repository execution-hook inspection.</description>
+    <language>en</language>
+    <lastBuildDate>Sat, 17 Oct 2026 00:00:00 GMT</lastBuildDate>
+    <atom:link href="https://harshitethic.github.io/clonepeek/feed.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>6 repository hooks to check before trusting a GitHub project</title>
+      <link>https://harshitethic.github.io/clonepeek/articles/repository-hooks-before-you-trust.html</link>
+      <guid isPermaLink="true">https://harshitethic.github.io/clonepeek/articles/repository-hooks-before-you-trust.html</guid>
+      <description>Before opening a new project: a practical checklist for npm lifecycle, VS Code tasks, devcontainers, Claude Code/Cursor hooks, and MCP launch commands.</description>
+      <pubDate>Sat, 17 Oct 2026 00:00:00 GMT</pubDate>
+          </item>
+    <item>
+      <title>The git diff that wasn't read-only</title>
+      <link>https://harshitethic.github.io/clonepeek/articles/git-fsmonitor-passive-scanning.html</link>
+      <guid isPermaLink="true">https://harshitethic.github.io/clonepeek/articles/git-fsmonitor-passive-scanning.html</guid>
+      <description>How a repository-local Git fsmonitor helper violated a passive scanner's assumptions, the inert regression test, and the scoped fix.</description>
+      <pubDate>Fri, 16 Oct 2026 00:00:00 GMT</pubDate>
+          </item>
+  </channel>
+</rss>
