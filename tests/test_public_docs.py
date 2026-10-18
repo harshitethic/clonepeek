@@ -70,6 +70,11 @@ class PublicDocsTests(unittest.TestCase):
         case = (DOCS / "articles/git-fsmonitor-passive-scanning.html").read_text(encoding="utf-8")
         self.assertIn("./articles/repository-hooks-before-you-trust.html", homepage)
         self.assertIn("Cross-platform test suite", homepage)
+        discussion = "https://www.producthunt.com/p/clonepeek/which-repo-defined-commands-do-you-check-before-opening-a-project"
+        self.assertIn(discussion, homepage)
+        self.assertIn(discussion, (ROOT / "README.md").read_text(encoding="utf-8"))
+        self.assertIn("https://www.producthunt.com/products/clonepeek", homepage)
+        self.assertNotIn("ask for upvotes", homepage.lower())
         self.assertNotIn("64 automated tests", homepage)
         self.assertNotIn("74 tests. Three OSes.", homepage)
         self.assertIn("ClonePeek v0.5.1", case)
