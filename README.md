@@ -6,7 +6,7 @@
 
 **Inspect hidden execution paths in an unfamiliar GitHub repository — without executing its code.**
 
-[Live website](https://harshitethic.github.io/clonepeek/) · [Developer discussion](https://www.producthunt.com/p/clonepeek/which-repo-defined-commands-do-you-check-before-opening-a-project) · [Quick start](#quick-start) · [5-minute audit guide](docs/BEFORE-YOU-TRUST-A-REPO.md) · [What it finds](#what-it-finds) · [CI and PR reviews](#ci-and-pr-reviews) · [Threat model](docs/THREAT_MODEL.md) · [Contribute](CONTRIBUTING.md)
+[Live website](https://harshitethic.github.io/clonepeek/) · [Watch genuine CLI replay](https://harshitethic.github.io/clonepeek/#video-demo) · [Developer discussion](https://www.producthunt.com/p/clonepeek/which-repo-defined-commands-do-you-check-before-opening-a-project) · [Quick start](#quick-start) · [5-minute audit guide](docs/BEFORE-YOU-TRUST-A-REPO.md) · [What it finds](#what-it-finds) · [CI and PR reviews](#ci-and-pr-reviews) · [Threat model](docs/THREAT_MODEL.md) · [Contribute](CONTRIBUTING.md)
 
 [![CI](https://github.com/harshitethic/clonepeek/actions/workflows/ci.yml/badge.svg)](https://github.com/harshitethic/clonepeek/actions/workflows/ci.yml) ![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-blue) ![License MIT](https://img.shields.io/badge/license-MIT-green) ![Offline scans](https://img.shields.io/badge/scanning-offline-black)
 

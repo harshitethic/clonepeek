@@ -121,7 +121,13 @@
       .final{padding:29px 20px}
     }
     @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important}}
-  </style>
+    /* Optional real-CLI video: no autoplay, tracking or third-party embed. */
+  .demo-video{margin-top:22px;padding:24px;border:1px solid #35455f;border-radius:20px;background:#111b2c}
+  .demo-video h3{margin:0 0 9px;font-size:clamp(21px,3vw,29px);letter-spacing:-.025em}
+  .demo-video p{margin:8px 0 17px;line-height:1.6;max-width:780px;color:#abbacf}
+  .demo-video video{display:block;width:100%;height:auto;aspect-ratio:16/9;background:#0d1526;border-radius:12px;border:1px solid #344662}
+  .demo-video .video-note{font-size:14px;margin:13px 0 0}
+</style>
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
@@ -174,6 +180,15 @@
   .cursor/hooks.json:8 · Cursor afterFileEdit event
   echo formatting-completed</pre>
     <div class="terminal-note"><strong>Demo only.</strong> Reserved <code>.invalid</code> addresses; commands never executed. Severity describes heuristic review priority, not confirmed malicious behavior. <a class="subtle-link" href="https://github.com/harshitethic/clonepeek/blob/main/assets/demo-output.txt">See full original output ↗</a></div>
+  </div>
+  <div class="demo-video" id="video-demo" aria-labelledby="video-demo-title">
+    <h3 id="video-demo-title">A real CLI run, in 34 seconds.</h3>
+    <p>Captioned playback of actual ClonePeek stdout from the versioned <code>examples/agent-hooks</code> fixture, with synthetic commands that the scanner never executes. The moving text is an edited replay, not a live scan or proof of security.</p>
+    <video controls playsinline preload="none" width="1280" height="720" poster="./media/clonepeek-real-cli-demo-poster.jpg" aria-label="34-second captioned ClonePeek CLI walkthrough">
+      <source src="./media/clonepeek-real-cli-demo.mp4" type="video/mp4">
+      Your browser cannot play this video. <a href="./media/clonepeek-real-cli-demo.mp4">Open the MP4 walkthrough</a>.
+    </video>
+    <p class="video-note"><a class="subtle-link" href="./media/actual-cli-stdout.txt">Read the exact, unedited CLI output and reproduction command ↗</a> · 34 seconds · silent video with on-screen text · no third-party embed</p>
   </div>
 </section>
 <section class="wrap" id="how">
