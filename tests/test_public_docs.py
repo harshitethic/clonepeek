@@ -74,6 +74,9 @@ class PublicDocsTests(unittest.TestCase):
         self.assertIn(discussion, homepage)
         self.assertIn(discussion, (ROOT / "README.md").read_text(encoding="utf-8"))
         self.assertIn("https://www.producthunt.com/products/clonepeek", homepage)
+        marketplace = "https://github.com/marketplace/actions/clonepeek-passive-repository-execution-audit"
+        self.assertIn(marketplace, homepage)
+        self.assertIn(marketplace, (ROOT / "README.md").read_text(encoding="utf-8"))
         self.assertNotIn("ask for upvotes", homepage.lower())
         self.assertNotIn("64 automated tests", homepage)
         self.assertNotIn("74 tests. Three OSes.", homepage)
