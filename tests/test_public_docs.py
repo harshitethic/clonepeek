@@ -60,6 +60,12 @@ class PublicDocsTests(unittest.TestCase):
         self.assertEqual(structured["mainEntityOfPage"], probe.canonical[0])
         self.assertTrue(structured["isAccessibleForFree"])
 
+    def test_tiny_mobile_nav_preserves_primary_install_cta(self):
+        homepage = (DOCS / "index.html").read_text(encoding="utf-8")
+        self.assertIn('@media(max-width:340px)', homepage)
+        self.assertIn('.links>a[href="#install"]{display:none}', homepage)
+        self.assertIn('href="#install">Run a passive audit', homepage)
+
     def test_sitemap_home_and_existing_article_links(self):
         root = ET.parse(DOCS / "sitemap.xml").getroot()
         urls = [el.text for el in root.findall("{http://www.sitemaps.org/schemas/sitemap/0.9}url/{http://www.sitemaps.org/schemas/sitemap/0.9}loc")]
