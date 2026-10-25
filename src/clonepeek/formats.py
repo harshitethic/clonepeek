@@ -107,7 +107,7 @@ def redact(value: str, length: int = 240) -> str:
         value,
     )
     value = re.sub(
-        r"""(?i)\b(?P<key>password|token|api[_-]?key|secret)\s*[=:]\s*(?P<secret>[^\s,;'"\\]+)""",
+        r"""(?i)\b(?P<key>password|token|api[_-]?key|secret)\s*[=:]\s*(?P<secret>[^&#\s,;'"\\]+)""",
         lambda m: f"{m['key']}=[REDACTED]",
         value,
     )
