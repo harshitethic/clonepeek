@@ -25,6 +25,20 @@ class RedactionTests(unittest.TestCase):
                 self.assertNotIn("WITH SPACES", shown)
                 self.assertIn("[REDACTED]", shown)
 
+    def test_basic_authorization_header(self):
+        encoded = "dXNlcjpzdXBlci1zZWNyZXQ="
+        shown = redact('curl -H "Authorization: Basic ' + encoded + '" https://example.invalid')
+        self.assertNotIn(encoded, shown)
+        self.assertIn("Basic [REDACTED]", shown)
+
+    def test_url_query_credentials_and_scheme_preservation(self):
+        shown = redact("http://public.invalid/path?api_key=" + SENTINEL + "&mode=fast")
+        self.assertNotIn(SENTINEL, shown)
+        self.assertIn("api_key=[REDACTED]&mode=fast", shown)
+        shown_auth = redact("http://user:password@public.invalid/path")
+        self.assertIn("http://[REDACTED]@public.invalid", shown_auth)
+        self.assertNotIn("user:password", shown_auth)
+
     def test_bearer_authorization_header(self):
         shown = redact(f'curl -H "Authorization: Bearer {SENTINEL}" https://example.invalid')
         self.assertNotIn(SENTINEL, shown)
