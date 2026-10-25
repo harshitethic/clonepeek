@@ -128,7 +128,19 @@ def redact(value: str, length: int = 240) -> str:
         r"""(?i)(\bauthorization\s*[:=]\s*bearer\s+)([^\s"';,]+)""",
         r"\1[REDACTED]", value,
     )
-    value = re.sub(r"https?://[^\s/@]+:[^\s/@]+@", "https://[REDACTED]@", value)
+    # HTTP Basic headers contain encoded credentials; never expose them in reports.
+    value = re.sub(
+        r"(?i)(\bauthorization\s*[:=]\s*basic\s+)[A-Za-z0-9+/=]+",
+        r"\1[REDACTED]", value,
+    )
+    # Mask security-sensitive URL parameters without dropping unrelated parameters.
+    value = re.sub(
+        r"""(?i)([?&](?:api[_-]?key|access[_-]?token|auth[_-]?token|client[_-]?secret|password|token|secret)=)[^\s&#"']+""",
+        r"\1[REDACTED]", value,
+    )
+    value = re.sub(
+        r"(?i)(https?://)[^\s/@]+:[^\s/@]+@", r"\1[REDACTED]@", value,
+    )
     value = value.replace("\r", " ").replace("\n", " ").strip()
     return value[:length] + ("…" if len(value) > length else "")
 
