@@ -174,8 +174,16 @@ def sarif(findings: list[Finding]) -> dict:
     }
 
 
+MAX_BASELINE_BYTES = 16 * 1024 * 1024
+
+
 def load_baseline(path: Path) -> set[str]:
-    obj = json.loads(path.read_text(encoding="utf-8"))
+    # Read only a fixed budget, even when a baseline path points to a huge file.
+    with path.open("rb") as stream:
+        raw = stream.read(MAX_BASELINE_BYTES + 1)
+    if len(raw) > MAX_BASELINE_BYTES:
+        raise ValueError("Baseline exceeds 16 MiB maximum")
+    obj = json.loads(raw.decode("utf-8"))
     if not isinstance(obj, dict) or obj.get("schema") != "clonepeek-baseline-v1" or not isinstance(obj.get("fingerprints"), list):
         raise ValueError("Not a ClonePeek v1 baseline")
     if not all(isinstance(x, str) for x in obj["fingerprints"]):
