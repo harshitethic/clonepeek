@@ -53,6 +53,12 @@ class RedactionTests(unittest.TestCase):
         token = "pypi-" + "c" * 28
         self.assertNotIn(token, redact(token))
 
+    def test_slack_workspace_tokens_masked(self):
+        for prefix in ("xoxb-", "xoxp-", "xoxa-", "xoxr-", "xoxs-"):
+            token = prefix + "a" * 20
+            with self.subTest(prefix=prefix):
+                self.assertNotIn(token, redact(token))
+
 
 if __name__ == "__main__":
     unittest.main()
