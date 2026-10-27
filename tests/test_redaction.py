@@ -69,6 +69,10 @@ class RedactionTests(unittest.TestCase):
         token = "AIza" + "x" * 35
         self.assertNotIn(token, redact("key=" + token))
 
+    def test_temporary_aws_key_masked(self):
+        token = "ASIA" + "A" * 16
+        self.assertNotIn(token, redact(token))
+
 
 if __name__ == "__main__":
     unittest.main()
