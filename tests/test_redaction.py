@@ -73,6 +73,10 @@ class RedactionTests(unittest.TestCase):
         token = "ASIA" + "A" * 16
         self.assertNotIn(token, redact(token))
 
+    def test_bot_authorization_header_masked(self):
+        self.assertNotIn(SENTINEL, redact("Authorization: Bot " + SENTINEL))
+        self.assertNotIn(SENTINEL, redact("authorization=bot " + SENTINEL))
+
 
 if __name__ == "__main__":
     unittest.main()
