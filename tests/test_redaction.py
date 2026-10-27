@@ -45,6 +45,10 @@ class RedactionTests(unittest.TestCase):
         token = "glpat-" + "a" * 18
         self.assertNotIn(token, redact(token))
 
+    def test_npm_auth_token_masked(self):
+        token = "npm_" + "b" * 24
+        self.assertNotIn(token, redact("publish " + token))
+
 
 if __name__ == "__main__":
     unittest.main()
