@@ -65,6 +65,10 @@ class RedactionTests(unittest.TestCase):
             self.assertNotIn("sk_" + env + "_" + suffix, redact("sk_" + env + "_" + suffix))
         self.assertIn("pk_test_" + suffix, redact("pk_test_" + suffix))
 
+    def test_google_api_key_masked(self):
+        token = "AIza" + "x" * 35
+        self.assertNotIn(token, redact("key=" + token))
+
 
 if __name__ == "__main__":
     unittest.main()

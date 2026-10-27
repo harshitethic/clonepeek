@@ -105,6 +105,7 @@ def redact(value: str, length: int = 240) -> str:
     value = re.sub(r"\bpypi-[A-Za-z0-9_-]{20,}\b", "[REDACTED]", value)
     value = re.sub(r"\bxox[baprs]-[A-Za-z0-9-]{12,}\b", "[REDACTED]", value)
     value = re.sub(r"\bsk_(?:live|test)_[A-Za-z0-9]{16,}\b", "[REDACTED]", value)
+    value = re.sub(r"\bAIza[0-9A-Za-z_-]{35}\b", "[REDACTED]", value)
     # Quoted assignments may contain spaces; mask the whole credential.
     value = re.sub(
         r"""(?i)\b(?P<key>password|token|api[_-]?key|secret)\s*[=:]\s*(?P<quote>['"])(?P<secret>.*?)(?P=quote)""",
