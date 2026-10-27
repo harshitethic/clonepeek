@@ -49,6 +49,10 @@ class RedactionTests(unittest.TestCase):
         token = "npm_" + "b" * 24
         self.assertNotIn(token, redact("publish " + token))
 
+    def test_pypi_upload_token_masked(self):
+        token = "pypi-" + "c" * 28
+        self.assertNotIn(token, redact(token))
+
 
 if __name__ == "__main__":
     unittest.main()
