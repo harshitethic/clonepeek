@@ -59,6 +59,12 @@ class RedactionTests(unittest.TestCase):
             with self.subTest(prefix=prefix):
                 self.assertNotIn(token, redact(token))
 
+    def test_stripe_secret_keys_but_not_publishable_key(self):
+        suffix = "a" * 24
+        for env in ("live", "test"):
+            self.assertNotIn("sk_" + env + "_" + suffix, redact("sk_" + env + "_" + suffix))
+        self.assertIn("pk_test_" + suffix, redact("pk_test_" + suffix))
+
 
 if __name__ == "__main__":
     unittest.main()
