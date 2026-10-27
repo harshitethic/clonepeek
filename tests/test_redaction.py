@@ -41,6 +41,10 @@ class RedactionTests(unittest.TestCase):
             self.assertNotIn(SENTINEL, report)
             self.assertIn("[REDACTED]", report)
 
+    def test_gitlab_pat_masked(self):
+        token = "glpat-" + "a" * 18
+        self.assertNotIn(token, redact(token))
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -100,6 +100,7 @@ def redact(value: str, length: int = 240) -> str:
     """Best-effort masking in scanner evidence; review reports before sharing."""
     value = re.sub(r"(?i)(gh[pousr]_[A-Za-z0-9_]{12,}|github_pat_[A-Za-z0-9_]{12,}|sk-[A-Za-z0-9_-]{16,}|AKIA[0-9A-Z]{16})", "[REDACTED]", value)
 
+    value = re.sub(r"\bglpat-[A-Za-z0-9_-]{12,}\b", "[REDACTED]", value)
     # Quoted assignments may contain spaces; mask the whole credential.
     value = re.sub(
         r"""(?i)\b(?P<key>password|token|api[_-]?key|secret)\s*[=:]\s*(?P<quote>['"])(?P<secret>.*?)(?P=quote)""",
