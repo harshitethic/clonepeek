@@ -41,6 +41,58 @@ class RedactionTests(unittest.TestCase):
             self.assertNotIn(SENTINEL, report)
             self.assertIn("[REDACTED]", report)
 
+    def test_gitlab_pat_masked(self):
+        token = "glpat-" + "a" * 18
+        self.assertNotIn(token, redact(token))
+
+    def test_npm_auth_token_masked(self):
+        token = "npm_" + "b" * 24
+        self.assertNotIn(token, redact("publish " + token))
+
+    def test_pypi_upload_token_masked(self):
+        token = "pypi-" + "c" * 28
+        self.assertNotIn(token, redact(token))
+
+    def test_slack_workspace_tokens_masked(self):
+        for prefix in ("xoxb-", "xoxp-", "xoxa-", "xoxr-", "xoxs-"):
+            token = prefix + "a" * 20
+            with self.subTest(prefix=prefix):
+                self.assertNotIn(token, redact(token))
+
+    def test_stripe_secret_keys_but_not_publishable_key(self):
+        suffix = "a" * 24
+        for env in ("live", "test"):
+            self.assertNotIn("sk_" + env + "_" + suffix, redact("sk_" + env + "_" + suffix))
+        self.assertIn("pk_test_" + suffix, redact("pk_test_" + suffix))
+
+    def test_google_api_key_masked(self):
+        token = "AIza" + "x" * 35
+        self.assertNotIn(token, redact("key=" + token))
+
+    def test_temporary_aws_key_masked(self):
+        token = "ASIA" + "A" * 16
+        self.assertNotIn(token, redact(token))
+
+    def test_bot_authorization_header_masked(self):
+        self.assertNotIn(SENTINEL, redact("Authorization: Bot " + SENTINEL))
+        self.assertNotIn(SENTINEL, redact("authorization=bot " + SENTINEL))
+
+    def test_embedded_credentials_in_multiple_url_schemes(self):
+        for scheme in ("socks5", "socks5h", "ssh", "ftp", "https"):
+            raw = scheme + "://alice:" + SENTINEL + "@host.invalid/path"
+            shown = redact(raw)
+            with self.subTest(scheme=scheme):
+                self.assertNotIn(SENTINEL, shown)
+                self.assertIn("[REDACTED]@", shown)
+
+    def test_terminal_and_bidi_controls_are_neutralized(self):
+        token = "glpat-" + "a" * 8 + "\x1b[31m" + "b" * 8
+        shown = redact("safe " + token + "\x1b[0m\u202e")
+        self.assertNotIn("glpat-", shown)
+        self.assertNotIn("\x1b", shown)
+        self.assertNotIn("\u202e", shown)
+        self.assertEqual(redact("normal plain text"), "normal plain text")
+
 
 if __name__ == "__main__":
     unittest.main()
