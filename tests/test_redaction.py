@@ -77,6 +77,14 @@ class RedactionTests(unittest.TestCase):
         self.assertNotIn(SENTINEL, redact("Authorization: Bot " + SENTINEL))
         self.assertNotIn(SENTINEL, redact("authorization=bot " + SENTINEL))
 
+    def test_embedded_credentials_in_multiple_url_schemes(self):
+        for scheme in ("socks5", "socks5h", "ssh", "ftp", "https"):
+            raw = scheme + "://alice:" + SENTINEL + "@host.invalid/path"
+            shown = redact(raw)
+            with self.subTest(scheme=scheme):
+                self.assertNotIn(SENTINEL, shown)
+                self.assertIn("[REDACTED]@", shown)
+
 
 if __name__ == "__main__":
     unittest.main()

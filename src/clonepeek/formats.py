@@ -108,6 +108,7 @@ def redact(value: str, length: int = 240) -> str:
     value = re.sub(r"\bAIza[0-9A-Za-z_-]{35}\b", "[REDACTED]", value)
     value = re.sub(r"\bASIA[0-9A-Z]{16}\b", "[REDACTED]", value)
     value = re.sub(r"(?i)(\bauthorization\s*[:=]\s*bot\s+)\S+", r"\1[REDACTED]", value)
+    value = re.sub(r"(?i)\b(?P<scheme>https?|socks5h?|ftp|ssh)://[^\s/@]+:[^\s/@]+@", lambda m: m["scheme"] + "://[REDACTED]@", value)
     # Quoted assignments may contain spaces; mask the whole credential.
     value = re.sub(
         r"""(?i)\b(?P<key>password|token|api[_-]?key|secret)\s*[=:]\s*(?P<quote>['"])(?P<secret>.*?)(?P=quote)""",
