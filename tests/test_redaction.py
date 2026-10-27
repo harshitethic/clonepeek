@@ -85,6 +85,14 @@ class RedactionTests(unittest.TestCase):
                 self.assertNotIn(SENTINEL, shown)
                 self.assertIn("[REDACTED]@", shown)
 
+    def test_terminal_and_bidi_controls_are_neutralized(self):
+        token = "glpat-" + "a" * 8 + "\x1b[31m" + "b" * 8
+        shown = redact("safe " + token + "\x1b[0m\u202e")
+        self.assertNotIn("glpat-", shown)
+        self.assertNotIn("\x1b", shown)
+        self.assertNotIn("\u202e", shown)
+        self.assertEqual(redact("normal plain text"), "normal plain text")
+
 
 if __name__ == "__main__":
     unittest.main()

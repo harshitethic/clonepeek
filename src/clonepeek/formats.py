@@ -98,6 +98,12 @@ def load_json(text: str, jsonc: bool = False):
 
 def redact(value: str, length: int = 240) -> str:
     """Best-effort masking in scanner evidence; review reports before sharing."""
+    value = re.sub(r"\x1b\][^\x07\x1b]*(?:\x07|\x1b\\)", "", value)
+    value = re.sub(r"\x1b\[[0-?]*[ -/]*[@-~]", "", value)
+    value = "".join(
+        " " if ord(char) < 32 or 127 <= ord(char) <= 159 or char in "\u202a\u202b\u202c\u202d\u202e\u2066\u2067\u2068\u2069"
+        else char for char in value
+    )
     value = re.sub(r"(?i)(gh[pousr]_[A-Za-z0-9_]{12,}|github_pat_[A-Za-z0-9_]{12,}|sk-[A-Za-z0-9_-]{16,}|AKIA[0-9A-Z]{16})", "[REDACTED]", value)
 
     value = re.sub(r"\bglpat-[A-Za-z0-9_-]{12,}\b", "[REDACTED]", value)
