@@ -81,7 +81,8 @@ def changed_paths(root: Path, ref: str) -> set[str]:
     except (FileNotFoundError, subprocess.TimeoutExpired) as exc:
         raise ScanError(f"git diff is unavailable: {exc}") from exc
     if proc.returncode != 0:
-        raise ScanError("git diff failed: " + proc.stderr.decode("utf-8", "replace")[:300])
+        # Untrusted Git stderr can contain configured URLs or credentials.
+        raise ScanError("git diff failed; verify the ref and repository state")
     return {p.decode("utf-8", "surrogateescape").replace("\\", "/") for p in proc.stdout.split(b"\0") if p}
 
 
