@@ -216,8 +216,10 @@ def inspect(path: str, text: str) -> list[Finding]:
                         identity=f"{event}:{index}:{command}",
                     ))
     if is_mcp:
-        servers = obj.get("mcpServers", obj.get("servers", {}))
-        if isinstance(servers, dict):
+        for container in ("mcpServers", "servers"):
+            servers = obj.get(container, {})
+            if not isinstance(servers, dict):
+                continue
             for name, cfg in servers.items():
                 if not isinstance(cfg, dict) or not isinstance(cfg.get("command"), str):
                     continue
@@ -225,5 +227,5 @@ def inspect(path: str, text: str) -> list[Finding]:
                 result.append(emit(rule="mcp-server-process", path=path, text=text,
                                    needle=f'"{name}"', trigger="Agent client starts/approves a local MCP server",
                                    title=f"MCP server process: {redact(str(name), 60)}",
-                                   command=cmd, base="medium", identity=f"{name}:{cmd}"))
+                                   command=cmd, base="medium", identity=f"{container}:{name}:{cmd}"))
     return result

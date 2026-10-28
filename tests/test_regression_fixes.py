@@ -46,3 +46,10 @@ def test_redact_basic_authorization_header():
     assert "dXNlcjpwYXNz" not in redact("Authorization: Basic dXNlcjpwYXNz")
     assert "[REDACTED]" in redact("Authorization: Basic dXNlcjpwYXNz")
 
+def test_mcp_detects_both_supported_server_containers():
+    from clonepeek.detectors import inspect
+    text = '{"mcpServers":{"first":{"command":"node"}},"servers":{"second":{"command":"python"}}}'
+    assert {f.title for f in inspect("mcp.json", text)} == {
+        "MCP server process: first", "MCP server process: second"
+    }
+
