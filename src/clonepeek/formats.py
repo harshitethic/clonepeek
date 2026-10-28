@@ -38,7 +38,9 @@ def jsonc_to_json(text: str) -> str:
             if block:
                 while i + 1 < n and not (chars[i] == "*" and chars[i + 1] == "/"):
                     i += 1
-                i = min(n, i + 2)
+                if i + 1 >= n:
+                    raise ValueError("Unterminated JSONC block comment")
+                i += 2
             else:
                 while i < n and chars[i] != "\n":
                     i += 1
