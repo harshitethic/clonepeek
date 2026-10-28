@@ -20,3 +20,8 @@ def test_destructive_split_short_flags_are_high(command):
     from clonepeek.detectors import assess
     assert assess(command, "low")[0] == "high"
 
+@pytest.mark.parametrize("command", ["rm --recursive --force /tmp/archive", "rm --force --recursive /tmp/archive"])
+def test_destructive_long_flags_are_high(command):
+    from clonepeek.detectors import assess
+    assert assess(command, "low")[0] == "high"
+
