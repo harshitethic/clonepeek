@@ -30,3 +30,14 @@ def test_powershell_rest_commands_count_as_network(command):
     from clonepeek.detectors import assess
     assert assess(command, "low")[0] == "medium"
 
+@pytest.mark.parametrize("secret", [
+    'AWS_SECRET_ACCESS_KEY="redact_this_value"',
+    "GITHUB_TOKEN='redact_this_value'",
+    'client_secret=redact_this_value',
+])
+def test_redact_prefixed_credential_assignments(secret):
+    from clonepeek.formats import redact
+    result = redact(secret)
+    assert "redact_this_value" not in result
+    assert "[REDACTED]" in result
+
