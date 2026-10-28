@@ -11,6 +11,7 @@ from .models import Finding
 
 FETCH_EXEC = re.compile(r"(?is)(?:curl|wget|iwr|invoke-webrequest)\b[^\n|]{0,350}\|\s*(?:sudo\s+)?(?:ba?sh|zsh|sh|python\d?|node|pwsh|powershell|cmd|iex|invoke-expression)\b|\b(?:bash|sh|pwsh|powershell)\s+<(?:\(|\s)*\s*(?:curl|wget)\b")
 FETCH_EXEC_ABSOLUTE = re.compile(r"(?is)\b(?:curl|wget|iwr|invoke-webrequest)\b[^\n|]{0,350}\|\s*(?:sudo\s+)?/(?:usr/)?bin/(?:bash|sh|zsh|pwsh|python\d?|node)\b")
+FETCH_EXEC_ENV = re.compile(r"(?is)\b(?:curl|wget|iwr|invoke-webrequest)\b[^\n|]{0,350}\|\s*(?:sudo\s+)?/(?:usr/)?bin/env\s+(?:-[A-Za-z]+\s+)?(?:bash|sh|zsh|python\d?|node)\b")
 # PowerShell download/execute also appears as iex (iwr URI).Content, not
 # just the common iwr URI | iex pipe. This is a narrow static heuristic:
 # it requires an Invoke-WebRequest call nested in Invoke-Expression.
@@ -26,7 +27,7 @@ SHELL = re.compile(r"(?i)\b(?:bash|sh|zsh|pwsh|powershell|cmd(?:\.exe)?)\b")
 
 def assess(command: str, base: str) -> tuple[str, str, str]:
     """Return severity, reason, and recommendation. Heuristics, not proof."""
-    if FETCH_EXEC.search(command) or FETCH_EXEC_ABSOLUTE.search(command) or POWERSHELL_EVAL_FETCH.search(command):
+    if FETCH_EXEC.search(command) or FETCH_EXEC_ABSOLUTE.search(command) or FETCH_EXEC_ENV.search(command) or POWERSHELL_EVAL_FETCH.search(command):
         return "critical", "A network response appears to be piped directly to a command interpreter.", "Remove fetch-and-execute. Download, verify and pin artifacts before running."
     if CREDENTIALS.search(command) and NETWORK.search(command):
         return "critical", "Credentials and a network destination appear together; review for exfiltration.", "Inspect the full command and all referenced files before trusting it."

