@@ -53,3 +53,14 @@ def test_mcp_detects_both_supported_server_containers():
         "MCP server process: first", "MCP server process: second"
     }
 
+def test_cli_rejects_output_baseline_collision(tmp_path, capsys):
+    from clonepeek.cli import run
+    output = tmp_path / "report.json"
+    assert run([str(tmp_path), "--format", "json", "--output", str(output),
+                "--write-baseline", str(output)]) == 2
+    assert not output.exists()
+    baseline = tmp_path / "known.json"
+    baseline.write_text('{"schema":"clonepeek-baseline-v1","fingerprints":[]}')
+    assert run([str(tmp_path), "--output", str(baseline), "--baseline", str(baseline)]) == 2
+    assert baseline.read_text().startswith('{"schema":')
+

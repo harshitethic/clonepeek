@@ -28,6 +28,10 @@ def build_parser() -> argparse.ArgumentParser:
 def run(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
     try:
+        if args.output and args.write_baseline and args.output.resolve() == args.write_baseline.resolve():
+            raise ValueError("--output and --write-baseline must use different paths")
+        if args.output and args.baseline and args.output.resolve() == args.baseline.resolve():
+            raise ValueError("--output must not overwrite the input baseline")
         findings, scanned, skipped = scan(Path(args.path), args.changed_since)
         known = load_baseline(args.baseline) if args.baseline else set()
         if args.write_baseline:

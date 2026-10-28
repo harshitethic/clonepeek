@@ -227,5 +227,5 @@ def inspect(path: str, text: str) -> list[Finding]:
                 result.append(emit(rule="mcp-server-process", path=path, text=text,
                                    needle=f'"{name}"', trigger="Agent client starts/approves a local MCP server",
                                    title=f"MCP server process: {redact(str(name), 60)}",
-                                   command=cmd, base="medium", identity=f"{container}:{name}:{cmd}"))
+                                   command=cmd, base="medium", identity=f"{name}:{cmd}"))
     return result
