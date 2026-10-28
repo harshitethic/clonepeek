@@ -20,6 +20,7 @@ POWERSHELL_EVAL_FETCH = re.compile(
 )
 CREDENTIALS = re.compile(r"(?i)(?:\$\{?(?:[A-Z0-9_]*(?:TOKEN|SECRET|PASSWORD|API_KEY|PRIVATE_KEY|CREDENTIAL)[A-Z0-9_]*)\}?|process\.env|os\.environ|\.env\b|id_rsa\b|\.aws/credentials|\.ssh/)")
 DESTRUCTIVE = re.compile(r"(?i)(?:\brm\s+-[a-z]*r[a-z]*f\b|\brm\s+-[a-z]*f[a-z]*r\b|\bformat\s+[a-z]:|\bmkfs\.|\bdel\s+/[fsq]|\bremove-item\b[^\n]{0,120}-(?:recurse|r)\b)")
+DESTRUCTIVE_SPLIT = re.compile(r"(?i)\brm(?:\s+-[rf]){2}(?=\s|$)")
 ENCODED = re.compile(r"(?i)(?:base64\s+(?:-d|--decode)|\batob\s*\(|\bfrombase64string\s*\(|\beval\s*\(|\bexec\s*\(|\b(?:powershell|pwsh)(?:\.exe)?\b[^\n]{0,140}-(?:encodedcommand|enc)\b)")
 NETWORK = re.compile(r"(?i)\b(?:curl|wget|fetch|iwr|invoke-webrequest)\b|https?://")
 SHELL = re.compile(r"(?i)\b(?:bash|sh|zsh|pwsh|powershell|cmd(?:\.exe)?)\b")
@@ -31,7 +32,7 @@ def assess(command: str, base: str) -> tuple[str, str, str]:
         return "critical", "A network response appears to be piped directly to a command interpreter.", "Remove fetch-and-execute. Download, verify and pin artifacts before running."
     if CREDENTIALS.search(command) and NETWORK.search(command):
         return "critical", "Credentials and a network destination appear together; review for exfiltration.", "Inspect the full command and all referenced files before trusting it."
-    if DESTRUCTIVE.search(command):
+    if DESTRUCTIVE.search(command) or DESTRUCTIVE_SPLIT.search(command):
         return "high", "This command contains a potentially destructive filesystem operation.", "Verify paths and scope; avoid automatic destructive commands."
     if ENCODED.search(command):
         return "high", "Encoded or dynamic execution makes behavior harder to inspect.", "Replace opaque execution with reviewable source and locked dependencies."
