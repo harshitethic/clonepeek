@@ -106,6 +106,8 @@ def redact(value: str, length: int = 240) -> str:
         " " if ord(char) < 32 or 127 <= ord(char) <= 159 or char in "\u202a\u202b\u202c\u202d\u202e\u2066\u2067\u2068\u2069"
         else char for char in value
     )
+    value = re.sub(r"(?i)(\bauthorization\s*[:=]\s*basic\s+)[A-Za-z0-9+/=]+",
+                   r"\1[REDACTED]", value)
     value = re.sub(r"(?i)(gh[pousr]_[A-Za-z0-9_]{12,}|github_pat_[A-Za-z0-9_]{12,}|sk-[A-Za-z0-9_-]{16,}|AKIA[0-9A-Z]{16})", "[REDACTED]", value)
 
     value = re.sub(r"\bglpat-[A-Za-z0-9_-]{12,}\b", "[REDACTED]", value)

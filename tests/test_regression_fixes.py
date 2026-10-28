@@ -41,3 +41,8 @@ def test_redact_prefixed_credential_assignments(secret):
     assert "redact_this_value" not in result
     assert "[REDACTED]" in result
 
+def test_redact_basic_authorization_header():
+    from clonepeek.formats import redact
+    assert "dXNlcjpwYXNz" not in redact("Authorization: Basic dXNlcjpwYXNz")
+    assert "[REDACTED]" in redact("Authorization: Basic dXNlcjpwYXNz")
+
