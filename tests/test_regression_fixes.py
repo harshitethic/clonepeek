@@ -25,3 +25,8 @@ def test_destructive_long_flags_are_high(command):
     from clonepeek.detectors import assess
     assert assess(command, "low")[0] == "high"
 
+@pytest.mark.parametrize("command", ["Invoke-RestMethod $endpoint", "irm $endpoint"])
+def test_powershell_rest_commands_count_as_network(command):
+    from clonepeek.detectors import assess
+    assert assess(command, "low")[0] == "medium"
+

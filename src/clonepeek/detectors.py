@@ -23,7 +23,7 @@ DESTRUCTIVE = re.compile(r"(?i)(?:\brm\s+-[a-z]*r[a-z]*f\b|\brm\s+-[a-z]*f[a-z]*
 DESTRUCTIVE_SPLIT = re.compile(r"(?i)\brm(?:\s+-[rf]){2}(?=\s|$)")
 DESTRUCTIVE_LONG = re.compile(r"(?i)\brm\s+--(?:recursive\s+--force|force\s+--recursive)(?=\s|$)")
 ENCODED = re.compile(r"(?i)(?:base64\s+(?:-d|--decode)|\batob\s*\(|\bfrombase64string\s*\(|\beval\s*\(|\bexec\s*\(|\b(?:powershell|pwsh)(?:\.exe)?\b[^\n]{0,140}-(?:encodedcommand|enc)\b)")
-NETWORK = re.compile(r"(?i)\b(?:curl|wget|fetch|iwr|invoke-webrequest)\b|https?://")
+NETWORK = re.compile(r"(?i)\b(?:curl|wget|fetch|iwr|irm|invoke-webrequest|invoke-restmethod)\b|https?://")
 SHELL = re.compile(r"(?i)\b(?:bash|sh|zsh|pwsh|powershell|cmd(?:\.exe)?)\b")
 
 
