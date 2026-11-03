@@ -118,6 +118,11 @@ def redact(value: str, length: int = 240) -> str:
     value = re.sub(r"\bAIza[0-9A-Za-z_-]{35}\b", "[REDACTED]", value)
     value = re.sub(r"\bASIA[0-9A-Z]{16}\b", "[REDACTED]", value)
     value = re.sub(r"(?i)(\bauthorization\s*[:=]\s*bot\s+)\S+", r"\1[REDACTED]", value)
+    # Token/API-key authorization can carry opaque credentials without known prefixes.
+    value = re.sub(
+        r"""(?i)(\bauthorization\s*[:=]\s*(?:token|api[-_]?key)\s+)([^\s"';,]+)""",
+        r"\1[REDACTED]", value,
+    )
     value = re.sub(r"(?i)\b(?P<scheme>https?|socks5h?|ftp|ssh)://[^\s/@]+:[^\s/@]+@", lambda m: m["scheme"] + "://[REDACTED]@", value)
     # Environment-style names often prefix credential words (AWS_SECRET_ACCESS_KEY).
     key = r"[A-Za-z0-9_]*(?:password|passwd|token|api[_-]?key|secret|private[_-]?key|credential)[A-Za-z0-9_]*"
