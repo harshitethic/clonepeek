@@ -77,6 +77,28 @@ class RedactionTests(unittest.TestCase):
         self.assertNotIn(SENTINEL, redact("Authorization: Bot " + SENTINEL))
         self.assertNotIn(SENTINEL, redact("authorization=bot " + SENTINEL))
 
+    def test_token_and_api_key_authorization_headers(self):
+        # These auth styles do not require a recognizable token prefix.
+        for scheme in ("token", "Token", "ApiKey", "API-KEY", "api_key"):
+            for separator in (":", "="):
+                with self.subTest(scheme=scheme, separator=separator):
+                    shown = redact(f"Authorization{separator} {scheme} {SENTINEL}")
+                    self.assertNotIn(SENTINEL, shown)
+                    self.assertIn("[REDACTED]", shown)
+
+    def test_token_header_masked_in_all_report_formats(self):
+        cfg = {"mcpServers": {"header-test": {
+            "command": "curl",
+            "args": ["-H", f"Authorization: token {SENTINEL}", "https://example.invalid"],
+        }}}
+        findings = inspect(".mcp.json", json.dumps(cfg))
+        self.assertEqual(len(findings), 1)
+        for report in (render_text(findings, 1, 0),
+                       json.dumps([finding.to_dict() for finding in findings]),
+                       json.dumps(sarif(findings))):
+            self.assertNotIn(SENTINEL, report)
+            self.assertIn("[REDACTED]", report)
+
     def test_embedded_credentials_in_multiple_url_schemes(self):
         for scheme in ("socks5", "socks5h", "ssh", "ftp", "https"):
             raw = scheme + "://alice:" + SENTINEL + "@host.invalid/path"
