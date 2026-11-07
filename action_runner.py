@@ -41,6 +41,8 @@ def perform(env: Mapping[str, str] | None = None) -> int:
     try:
         if any(char in output for char in "\r\n"):
             raise ValueError("Output path must not contain line breaks")
+        if output and baseline_file and Path(output).resolve() == Path(baseline_file).resolve():
+            raise ValueError("Output must not overwrite the input baseline")
         findings, scanned, skipped = scan(Path(path), since)
         known = load_baseline(Path(baseline_file)) if baseline_file else set()
         if format_name == "text":
