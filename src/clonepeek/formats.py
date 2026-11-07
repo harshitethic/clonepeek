@@ -189,7 +189,7 @@ def render_text(findings: list[Finding], scanned: int, skipped: int,
         pieces.append(f"New: {sum(f.fingerprint not in known for f in findings)} · Known: {sum(f.fingerprint in known for f in findings)}")
     for f in findings:
         state = " [known]" if known is not None and f.fingerprint in known else ""
-        pieces.append(f"\n[{f.severity.upper()}] {f.title}{state}\n  {f.path}:{f.line} · {f.trigger}\n  {f.evidence}\n  Why: {f.why}\n  Next: {f.advice}")
+        pieces.append(f"\n[{f.severity.upper()}] {f.title}{state}\n  {redact(f.path, 1000)}:{f.line} · {redact(f.trigger, 1000)}\n  {f.evidence}\n  Why: {f.why}\n  Next: {f.advice}")
     if not findings:
         pieces.append("No modeled execution surfaces found. This is NOT a safety guarantee.")
     return "\n".join(pieces)
