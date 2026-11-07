@@ -95,7 +95,15 @@ def load_json(text: str, jsonc: bool = False):
                 raise ValueError("Configuration nesting exceeds 128 levels")
         elif char in "]}":
             depth = max(0, depth - 1)
-    return json.loads(prepared)
+    def unique_object(pairs):
+        result = {}
+        for key, value in pairs:
+            if key in result:
+                # Do not echo untrusted keys, which may contain secrets.
+                raise ValueError("Duplicate JSON object key")
+            result[key] = value
+        return result
+    return json.loads(prepared, object_pairs_hook=unique_object)
 
 
 def redact(value: str, length: int = 240) -> str:
