@@ -78,7 +78,7 @@ def inspect(path: str, text: str) -> list[Finding]:
     p = PurePosixPath(path)
     result: list[Finding] = []
     is_vscode = p.name == "tasks.json" and ".vscode" in p.parts
-    is_devcontainer = p.name == "devcontainer.json" and ".devcontainer" in p.parts
+    is_devcontainer = p.name == ".devcontainer.json" or (p.name == "devcontainer.json" and ".devcontainer" in p.parts)
     is_package = p.name == "package.json"
     is_mcp = p.name in ("mcp.json", ".mcp.json") or (p.name.endswith(".mcp.json"))
     is_claude = p.name in ("settings.json", "settings.local.json") and ".claude" in p.parts

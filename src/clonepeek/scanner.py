@@ -30,7 +30,7 @@ def recognized(relative: str) -> bool:
     basename = parts[-1]
     return (basename == "package.json" or
             (basename == "tasks.json" and ".vscode" in parts[:-1]) or
-            (basename == "devcontainer.json" and ".devcontainer" in parts[:-1]) or
+            (basename == ".devcontainer.json" or (basename == "devcontainer.json" and ".devcontainer" in parts[:-1])) or
             (basename in ("settings.json", "settings.local.json") and ".claude" in parts[:-1]) or
             (basename == "hooks.json" and ".cursor" in parts[:-1]) or
             (basename in ("mcp.json", ".mcp.json") or basename.endswith(".mcp.json")))
