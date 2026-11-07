@@ -133,6 +133,7 @@ def inspect(path: str, text: str) -> list[Finding]:
             events = {"preinstall": "npm install (before install)", "install": "npm install", "postinstall": "npm install (after install)",
                       "preprepare": "npm install/ci (before prepare)", "postprepare": "npm install/ci (after prepare)",
                       "prepare": "npm install/pack in supported npm workflows", "prepack": "npm pack/publish", "postpack": "npm pack/publish",
+                      "publish": "npm publish (after publication)", "postpublish": "npm publish (after publish hook)",
                       "prepublishOnly": "npm publish", "prepublish": "npm install/publish (legacy)"}
             for key, trigger in events.items():
                 if isinstance(scripts.get(key), str):
