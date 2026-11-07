@@ -42,10 +42,10 @@ def jsonc_to_json(text: str) -> str:
                     raise ValueError("Unterminated JSONC block comment")
                 i += 2
             else:
-                while i < n and chars[i] != "\n":
+                while i < n and chars[i] not in "\r\n":
                     i += 1
             for j in range(start, i):
-                if chars[j] != "\n":
+                if chars[j] not in "\r\n":
                     chars[j] = " "
             continue
         i += 1
