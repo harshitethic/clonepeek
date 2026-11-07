@@ -103,7 +103,10 @@ def load_json(text: str, jsonc: bool = False):
                 raise ValueError("Duplicate JSON object key")
             result[key] = value
         return result
-    return json.loads(prepared, object_pairs_hook=unique_object)
+    def reject_constant(value):
+        raise ValueError("Non-finite numbers are not valid JSON")
+    return json.loads(prepared, object_pairs_hook=unique_object,
+                      parse_constant=reject_constant)
 
 
 def redact(value: str, length: int = 240) -> str:
