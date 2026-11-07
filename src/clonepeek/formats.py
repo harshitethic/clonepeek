@@ -216,7 +216,7 @@ def sarif(findings: list[Finding]) -> dict:
 
 
 def load_baseline(path: Path) -> set[str]:
-    obj = json.loads(path.read_text(encoding="utf-8"))
+    obj = load_json(path.read_text(encoding="utf-8"))
     if not isinstance(obj, dict) or obj.get("schema") != "clonepeek-baseline-v1" or not isinstance(obj.get("fingerprints"), list):
         raise ValueError("Not a ClonePeek v1 baseline")
     if not all(isinstance(x, str) for x in obj["fingerprints"]):
