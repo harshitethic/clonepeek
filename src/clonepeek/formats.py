@@ -4,6 +4,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 import re
+from urllib.parse import quote
 
 from . import __version__
 from .models import Finding, SEVERITIES
@@ -206,7 +207,7 @@ def sarif(findings: list[Finding]) -> dict:
                 "ruleId": f.rule,
                 "level": "error" if SEVERITIES[f.severity] >= 3 else "warning" if SEVERITIES[f.severity] >= 2 else "note",
                 "message": {"text": f"{f.title}. Trigger: {f.trigger}. {f.why} Advice: {f.advice}"},
-                "locations": [{"physicalLocation": {"artifactLocation": {"uri": f.path},
+                "locations": [{"physicalLocation": {"artifactLocation": {"uri": quote(f.path, safe="/", errors="surrogatepass")},
                                                     "region": {"startLine": f.line}}}],
                 "partialFingerprints": {"clonepeek/v1": f.fingerprint},
                 "properties": {"severity": f.severity, "evidence": f.evidence},
