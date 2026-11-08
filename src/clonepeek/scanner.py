@@ -72,7 +72,7 @@ def changed_paths(root: Path, ref: str) -> set[str]:
             "-c", "protocol.file.allow=never",
             "-C", str(root),
             "diff", "--no-ext-diff", "--no-textconv",
-            "--name-only", "-z", "--diff-filter=ACMR", ref, "--",
+            "--name-only", "-z", "--diff-filter=ACMRD", ref, "--",
         ]
         proc = subprocess.run(
             argv, capture_output=True, timeout=15, check=False,
