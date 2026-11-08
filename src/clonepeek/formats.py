@@ -70,7 +70,11 @@ def jsonc_to_json(text: str) -> str:
             while j < n and chars[j].isspace():
                 j += 1
             if j < n and chars[j] in "}]":
-                chars[i] = " "
+                previous = i - 1
+                while previous >= 0 and chars[previous].isspace():
+                    previous -= 1
+                if previous >= 0 and chars[previous] not in "{[:,":
+                    chars[i] = " "
         i += 1
     return "".join(chars)
 
