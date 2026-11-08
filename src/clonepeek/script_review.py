@@ -21,7 +21,7 @@ MAX_REFERENCES = 32
 # accepting inline code. This narrow matcher trades coverage for predictable
 # resolution of readable local paths.
 SCRIPT_CALL = re.compile(
-    r"(?<![\w./$])(?:sh|bash|zsh)\s+(?:-[a-zA-Z]+\s+){0,2}"
+    r"(?<![\w./$])(?:sh|bash|zsh)\s+(?:-[a-bd-zA-BD-Z]+\s+){0,2}"
     r"['\"]?((?:\./)?[a-zA-Z0-9_./-]+\.sh)['\"]?(?=$|[\s;&|])"
     r"|(?<![\w/$])((?:\./)[a-zA-Z0-9_./-]+\.sh)(?=$|[\s;&|])"
 )
