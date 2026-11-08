@@ -70,7 +70,7 @@ def emit(*, rule: str, path: str, text: str, needle: str, trigger: str,
     return Finding.make(rule=rule, severity=severity, path=path,
                         line=line_for(text, needle, start), trigger=trigger,
                         title=title, evidence=redact(command), why=why,
-                        advice=advice, identity=identity or command)
+                        advice=advice, identity=identity or command, analysis_command=command)
 
 
 def inspect(path: str, text: str) -> list[Finding]:
@@ -125,7 +125,7 @@ def inspect(path: str, text: str) -> list[Finding]:
                                            trigger=finding.trigger, title=finding.title,
                                            evidence=finding.evidence, why="This folder-open task hides terminal output.",
                                            advice="Disable automatic tasks and inspect this task before trusting the workspace.",
-                                           identity=f"{index}:{command}:{hidden}")
+                                           identity=f"{index}:{command}:{hidden}", analysis_command=command)
                 result.append(finding)
     if is_package:
         scripts = obj.get("scripts", {})

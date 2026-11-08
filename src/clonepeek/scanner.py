@@ -165,7 +165,7 @@ def scan(root: Path, since: str | None = None) -> tuple[list[Finding], int, int]
                                         "devcontainer-lifecycle", "cursor-hook-command",
                                         "claude-hook-command", "mcp-server-process"}:
                     continue
-                for reference in literal_script_refs(finding.evidence):
+                for reference in literal_script_refs(finding.analysis_command or finding.evidence):
                     if not config_changed:
                         target = safe_script_path(root, finding.path, reference)
                         if target is None or target[0] not in changed:
