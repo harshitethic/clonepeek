@@ -79,11 +79,20 @@ def review_script(*, root: Path, source: Finding, reference: str,
     except (OSError, UnicodeError) as exc:
         return [_skipped(source, reference, f"Script could not be read: {type(exc).__name__}.")]
     result: list[Finding] = []
+    pending = ""
+    start_line = 1
     for lineno, raw_line in enumerate(content.splitlines(), 1):
         if lineno > MAX_SCRIPT_LINES:
             result.append(_skipped(source, reference, "Script exceeds the 2,000-line analysis limit."))
             break
-        line = raw_line.strip()
+        if not pending:
+            start_line = lineno
+        trailing = len(raw_line) - len(raw_line.rstrip("\\"))
+        if trailing % 2:
+            pending += raw_line[:-1]
+            continue
+        line = (pending + raw_line).strip()
+        pending = ""
         if not line or line.startswith("#"):
             continue
         severity, why, advice = assess(line, "low")
@@ -91,12 +100,12 @@ def review_script(*, root: Path, source: Finding, reference: str,
             continue
         result.append(Finding.make(
             rule="referenced-shell-risk", severity=severity, path=relative,
-            line=lineno, trigger=f"Referenced by {source.path}:{source.line} ({source.rule})",
+            line=start_line, trigger=f"Referenced by {source.path}:{source.line} ({source.rule})",
             title="Potentially risky command in referenced local shell script",
             evidence=redact(line),
             why="This line is inside an explicitly referenced .sh file. " + why,
             advice=advice + " This is a static heuristic, not verified execution.",
-            identity=f"{source.fingerprint}:{reference}:{lineno}:{line}",
+            identity=f"{source.fingerprint}:{reference}:{start_line}:{line}",
         ))
     return result
 
