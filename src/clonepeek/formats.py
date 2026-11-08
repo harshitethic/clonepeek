@@ -181,7 +181,7 @@ def redact(value: str, length: int = 240) -> str:
 
 def line_for(text: str, needle: str, start: int = 0) -> int:
     position = text.find(needle, start)
-    return 1 + text.count("\n", 0, position) if position >= 0 else 1
+    return 1 + len(re.findall(r"\r\n|\r|\n", text[:position])) if position >= 0 else 1
 
 
 def render_text(findings: list[Finding], scanned: int, skipped: int,
