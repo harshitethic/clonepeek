@@ -130,7 +130,8 @@ def inspect(path: str, text: str) -> list[Finding]:
     if is_package:
         scripts = obj.get("scripts", {})
         if isinstance(scripts, dict):
-            events = {"preinstall": "npm install (before install)", "install": "npm install", "postinstall": "npm install (after install)",
+            events = {"dependencies": "npm operation changes node_modules",
+                      "preinstall": "npm install (before install)", "install": "npm install", "postinstall": "npm install (after install)",
                       "preprepare": "npm install/ci (before prepare)", "postprepare": "npm install/ci (after prepare)",
                       "prepare": "npm install/pack in supported npm workflows", "prepack": "npm pack/publish", "postpack": "npm pack/publish",
                       "publish": "npm publish (after publication)", "postpublish": "npm publish (after publish hook)",
