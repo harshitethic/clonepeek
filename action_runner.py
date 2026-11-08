@@ -16,7 +16,7 @@ from typing import Mapping
 sys.path.insert(0, str(Path(__file__).resolve().parent / "src"))
 
 from clonepeek import __version__
-from clonepeek.formats import load_baseline, render_text, sarif
+from clonepeek.formats import load_baseline, render_text, sarif, redact
 from clonepeek.models import SEVERITIES
 from clonepeek.scanner import ScanError, scan
 
@@ -92,7 +92,7 @@ def perform(env: Mapping[str, str] | None = None) -> int:
             return 1
         return 0
     except (ScanError, OSError, UnicodeError, ValueError, json.JSONDecodeError) as exc:
-        print(f"clonepeek action: {type(exc).__name__}: {exc}", file=sys.stderr)
+        print(f"clonepeek action: {type(exc).__name__}: {redact(str(exc), 1000)}", file=sys.stderr)
         return 2
 
 
