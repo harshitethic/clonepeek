@@ -96,7 +96,10 @@ def walk(root: Path) -> Iterator[tuple[str, Path]]:
             depth = len(path.relative_to(root).parts)
         except ValueError:
             continue
-        dirs[:] = sorted(d for d in dirs if d not in IGNORED and not (path / d).is_symlink() and depth < MAX_DEPTH)
+        eligible = sorted(d for d in dirs if d not in IGNORED and not (path / d).is_symlink())
+        if eligible and depth >= MAX_DEPTH:
+            raise ScanError(f"Scan exceeds maximum directory depth {MAX_DEPTH}; narrow the project root")
+        dirs[:] = eligible
         for name in sorted(files):
             seen += 1
             if seen > MAX_FILES:
