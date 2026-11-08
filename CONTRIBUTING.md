@@ -7,12 +7,12 @@ Contributions must improve the ability to inspect execution surfaces without run
 ```bash
 git clone https://github.com/harshitethic/clonepeek.git
 cd clonepeek
-python -m pip install -e .
-python -m unittest discover -s tests -v
+python -m pip install -e . pytest
+python -m pytest tests -q
 python -m clonepeek examples/suspicious
 ```
 
-No production dependencies; tests use Python's unittest. Keep public APIs compatible and add positive and negative regression tests for every detection pattern. Prefer standard-library implementations over installing executable scanners.
+No production dependencies; run the full suite with pytest (it also collects unittest cases). Keep public APIs compatible and add positive and negative regression tests for every detection pattern. Prefer standard-library implementations over installing executable scanners.
 
 ## Pull requests
 

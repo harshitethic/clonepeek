@@ -5,7 +5,7 @@ ClonePeek uses static rules. Severity reflects *review urgency*, not proof that 
 | Rule | Default | Trigger | Notes |
 | --- | --- | --- | --- |
 | `vscode-folder-open` | High | `runOn: folderOpen` task | Includes platform-specific commands and hidden `presentation.reveal`. Trust settings vary by editor/version. |
-| `npm-lifecycle` | Medium | npm lifecycle scripts | Only preinstall/install/postinstall/prepare/prepack/postpack/prepublishOnly/prepublish. Other package managers can differ. |
+| `npm-lifecycle` | Medium | npm lifecycle scripts | Covers preinstall/install/postinstall, preprepare/prepare/postprepare, prepack/postpack, prepublish/prepublishOnly/publish/postpublish, and dependencies. Other package managers can differ. |
 | `devcontainer-lifecycle` | Medium | setup/start/attach lifecycle commands | `initializeCommand` runs on host; other commands run in the container context. |
 | `devcontainer-feature` | Low | devcontainer feature installation | Version pinning is important; feature implementation is not analyzed. |
 | `mcp-server-process` | Medium | client starts/approves configured local MCP process | Remote URL-only servers are currently out of scope. |
