@@ -82,7 +82,7 @@ def changed_paths(root: Path, ref: str) -> set[str]:
         raise ScanError(f"git diff is unavailable: {exc}") from exc
     if proc.returncode != 0:
         raise ScanError("git diff failed: " + proc.stderr.decode("utf-8", "replace")[:300])
-    return {p.decode("utf-8", "surrogateescape").replace("\\", "/") for p in proc.stdout.split(b"\0") if p}
+    return {p.decode("utf-8", "surrogateescape") for p in proc.stdout.split(b"\0") if p}
 
 
 def walk(root: Path) -> Iterator[tuple[str, Path]]:
