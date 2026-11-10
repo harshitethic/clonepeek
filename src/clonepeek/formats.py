@@ -4,6 +4,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 import re
+from urllib.parse import quote
 
 from . import __version__
 from .models import Finding, SEVERITIES
@@ -42,10 +43,10 @@ def jsonc_to_json(text: str) -> str:
                     raise ValueError("Unterminated JSONC block comment")
                 i += 2
             else:
-                while i < n and chars[i] != "\n":
+                while i < n and chars[i] not in "\r\n":
                     i += 1
             for j in range(start, i):
-                if chars[j] != "\n":
+                if chars[j] not in "\r\n":
                     chars[j] = " "
             continue
         i += 1
@@ -69,7 +70,11 @@ def jsonc_to_json(text: str) -> str:
             while j < n and chars[j].isspace():
                 j += 1
             if j < n and chars[j] in "}]":
-                chars[i] = " "
+                previous = i - 1
+                while previous >= 0 and chars[previous].isspace():
+                    previous -= 1
+                if previous >= 0 and chars[previous] not in "{[:,":
+                    chars[i] = " "
         i += 1
     return "".join(chars)
 
@@ -95,7 +100,18 @@ def load_json(text: str, jsonc: bool = False):
                 raise ValueError("Configuration nesting exceeds 128 levels")
         elif char in "]}":
             depth = max(0, depth - 1)
-    return json.loads(prepared)
+    def unique_object(pairs):
+        result = {}
+        for key, value in pairs:
+            if key in result:
+                # Do not echo untrusted keys, which may contain secrets.
+                raise ValueError("Duplicate JSON object key")
+            result[key] = value
+        return result
+    def reject_constant(value):
+        raise ValueError("Non-finite numbers are not valid JSON")
+    return json.loads(prepared, object_pairs_hook=unique_object,
+                      parse_constant=reject_constant)
 
 
 def redact(value: str, length: int = 240) -> str:
@@ -165,7 +181,7 @@ def redact(value: str, length: int = 240) -> str:
 
 def line_for(text: str, needle: str, start: int = 0) -> int:
     position = text.find(needle, start)
-    return 1 + text.count("\n", 0, position) if position >= 0 else 1
+    return 1 + len(re.findall(r"\r\n|\r|\n", text[:position])) if position >= 0 else 1
 
 
 def render_text(findings: list[Finding], scanned: int, skipped: int,
@@ -177,7 +193,7 @@ def render_text(findings: list[Finding], scanned: int, skipped: int,
         pieces.append(f"New: {sum(f.fingerprint not in known for f in findings)} · Known: {sum(f.fingerprint in known for f in findings)}")
     for f in findings:
         state = " [known]" if known is not None and f.fingerprint in known else ""
-        pieces.append(f"\n[{f.severity.upper()}] {f.title}{state}\n  {f.path}:{f.line} · {f.trigger}\n  {f.evidence}\n  Why: {f.why}\n  Next: {f.advice}")
+        pieces.append(f"\n[{f.severity.upper()}] {f.title}{state}\n  {redact(f.path, 1000)}:{f.line} · {redact(f.trigger, 1000)}\n  {f.evidence}\n  Why: {f.why}\n  Next: {f.advice}")
     if not findings:
         pieces.append("No modeled execution surfaces found. This is NOT a safety guarantee.")
     return "\n".join(pieces)
@@ -195,7 +211,7 @@ def sarif(findings: list[Finding]) -> dict:
                 "ruleId": f.rule,
                 "level": "error" if SEVERITIES[f.severity] >= 3 else "warning" if SEVERITIES[f.severity] >= 2 else "note",
                 "message": {"text": f"{f.title}. Trigger: {f.trigger}. {f.why} Advice: {f.advice}"},
-                "locations": [{"physicalLocation": {"artifactLocation": {"uri": f.path},
+                "locations": [{"physicalLocation": {"artifactLocation": {"uri": quote(f.path, safe="/", errors="surrogatepass")},
                                                     "region": {"startLine": f.line}}}],
                 "partialFingerprints": {"clonepeek/v1": f.fingerprint},
                 "properties": {"severity": f.severity, "evidence": f.evidence},
@@ -205,7 +221,7 @@ def sarif(findings: list[Finding]) -> dict:
 
 
 def load_baseline(path: Path) -> set[str]:
-    obj = json.loads(path.read_text(encoding="utf-8"))
+    obj = load_json(path.read_text(encoding="utf-8"))
     if not isinstance(obj, dict) or obj.get("schema") != "clonepeek-baseline-v1" or not isinstance(obj.get("fingerprints"), list):
         raise ValueError("Not a ClonePeek v1 baseline")
     if not all(isinstance(x, str) for x in obj["fingerprints"]):

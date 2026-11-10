@@ -7,7 +7,7 @@ from pathlib import Path
 import sys
 
 from . import __version__
-from .formats import baseline, load_baseline, render_text, sarif
+from .formats import baseline, load_baseline, render_text, sarif, redact
 from .models import SEVERITIES
 from .scanner import ScanError, scan
 
@@ -52,7 +52,7 @@ def run(argv: list[str] | None = None) -> int:
             return 1
         return 0
     except (ScanError, OSError, ValueError, json.JSONDecodeError) as exc:
-        print(f"clonepeek: {exc}", file=sys.stderr)
+        print(f"clonepeek: {redact(str(exc), 1000)}", file=sys.stderr)
         return 2
 
 

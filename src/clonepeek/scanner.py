@@ -30,7 +30,7 @@ def recognized(relative: str) -> bool:
     basename = parts[-1]
     return (basename == "package.json" or
             (basename == "tasks.json" and ".vscode" in parts[:-1]) or
-            (basename == "devcontainer.json" and ".devcontainer" in parts[:-1]) or
+            (basename == ".devcontainer.json" or (basename == "devcontainer.json" and ".devcontainer" in parts[:-1])) or
             (basename in ("settings.json", "settings.local.json") and ".claude" in parts[:-1]) or
             (basename == "hooks.json" and ".cursor" in parts[:-1]) or
             (basename in ("mcp.json", ".mcp.json") or basename.endswith(".mcp.json")))
@@ -72,7 +72,7 @@ def changed_paths(root: Path, ref: str) -> set[str]:
             "-c", "protocol.file.allow=never",
             "-C", str(root),
             "diff", "--no-ext-diff", "--no-textconv",
-            "--name-only", "-z", "--diff-filter=ACMR", ref, "--",
+            "--name-only", "-z", "--diff-filter=ACMRD", ref, "--",
         ]
         proc = subprocess.run(
             argv, capture_output=True, timeout=15, check=False,
@@ -82,7 +82,7 @@ def changed_paths(root: Path, ref: str) -> set[str]:
         raise ScanError(f"git diff is unavailable: {exc}") from exc
     if proc.returncode != 0:
         raise ScanError("git diff failed: " + proc.stderr.decode("utf-8", "replace")[:300])
-    return {p.decode("utf-8", "surrogateescape").replace("\\", "/") for p in proc.stdout.split(b"\0") if p}
+    return {p.decode("utf-8", "surrogateescape") for p in proc.stdout.split(b"\0") if p}
 
 
 def walk(root: Path) -> Iterator[tuple[str, Path]]:
@@ -96,7 +96,10 @@ def walk(root: Path) -> Iterator[tuple[str, Path]]:
             depth = len(path.relative_to(root).parts)
         except ValueError:
             continue
-        dirs[:] = sorted(d for d in dirs if d not in IGNORED and not (path / d).is_symlink() and depth < MAX_DEPTH)
+        eligible = sorted(d for d in dirs if d not in IGNORED and not (path / d).is_symlink())
+        if eligible and depth >= MAX_DEPTH:
+            raise ScanError(f"Scan exceeds maximum directory depth {MAX_DEPTH}; narrow the project root")
+        dirs[:] = eligible
         for name in sorted(files):
             seen += 1
             if seen > MAX_FILES:
@@ -165,7 +168,7 @@ def scan(root: Path, since: str | None = None) -> tuple[list[Finding], int, int]
                                         "devcontainer-lifecycle", "cursor-hook-command",
                                         "claude-hook-command", "mcp-server-process"}:
                     continue
-                for reference in literal_script_refs(finding.evidence):
+                for reference in literal_script_refs(finding.analysis_command or finding.evidence):
                     if not config_changed:
                         target = safe_script_path(root, finding.path, reference)
                         if target is None or target[0] not in changed:

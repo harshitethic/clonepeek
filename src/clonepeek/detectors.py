@@ -70,7 +70,7 @@ def emit(*, rule: str, path: str, text: str, needle: str, trigger: str,
     return Finding.make(rule=rule, severity=severity, path=path,
                         line=line_for(text, needle, start), trigger=trigger,
                         title=title, evidence=redact(command), why=why,
-                        advice=advice, identity=identity or command)
+                        advice=advice, identity=identity or command, analysis_command=command)
 
 
 def inspect(path: str, text: str) -> list[Finding]:
@@ -78,7 +78,7 @@ def inspect(path: str, text: str) -> list[Finding]:
     p = PurePosixPath(path)
     result: list[Finding] = []
     is_vscode = p.name == "tasks.json" and ".vscode" in p.parts
-    is_devcontainer = p.name == "devcontainer.json" and ".devcontainer" in p.parts
+    is_devcontainer = p.name == ".devcontainer.json" or (p.name == "devcontainer.json" and ".devcontainer" in p.parts)
     is_package = p.name == "package.json"
     is_mcp = p.name in ("mcp.json", ".mcp.json") or (p.name.endswith(".mcp.json"))
     is_claude = p.name in ("settings.json", "settings.local.json") and ".claude" in p.parts
@@ -125,13 +125,16 @@ def inspect(path: str, text: str) -> list[Finding]:
                                            trigger=finding.trigger, title=finding.title,
                                            evidence=finding.evidence, why="This folder-open task hides terminal output.",
                                            advice="Disable automatic tasks and inspect this task before trusting the workspace.",
-                                           identity=f"{index}:{command}:{hidden}")
+                                           identity=f"{index}:{command}:{hidden}", analysis_command=command)
                 result.append(finding)
     if is_package:
         scripts = obj.get("scripts", {})
         if isinstance(scripts, dict):
-            events = {"preinstall": "npm install (before install)", "install": "npm install", "postinstall": "npm install (after install)",
+            events = {"dependencies": "npm operation changes node_modules",
+                      "preinstall": "npm install (before install)", "install": "npm install", "postinstall": "npm install (after install)",
+                      "preprepare": "npm install/ci (before prepare)", "postprepare": "npm install/ci (after prepare)",
                       "prepare": "npm install/pack in supported npm workflows", "prepack": "npm pack/publish", "postpack": "npm pack/publish",
+                      "publish": "npm publish (after publication)", "postpublish": "npm publish (after publish hook)",
                       "prepublishOnly": "npm publish", "prepublish": "npm install/publish (legacy)"}
             for key, trigger in events.items():
                 if isinstance(scripts.get(key), str):

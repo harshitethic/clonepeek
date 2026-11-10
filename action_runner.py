@@ -16,7 +16,7 @@ from typing import Mapping
 sys.path.insert(0, str(Path(__file__).resolve().parent / "src"))
 
 from clonepeek import __version__
-from clonepeek.formats import load_baseline, render_text, sarif
+from clonepeek.formats import load_baseline, render_text, sarif, redact
 from clonepeek.models import SEVERITIES
 from clonepeek.scanner import ScanError, scan
 
@@ -39,6 +39,10 @@ def perform(env: Mapping[str, str] | None = None) -> int:
         return 2
 
     try:
+        if any(char in output for char in "\r\n"):
+            raise ValueError("Output path must not contain line breaks")
+        if output and baseline_file and Path(output).resolve() == Path(baseline_file).resolve():
+            raise ValueError("Output must not overwrite the input baseline")
         findings, scanned, skipped = scan(Path(path), since)
         known = load_baseline(Path(baseline_file)) if baseline_file else set()
         if format_name == "text":
@@ -88,7 +92,7 @@ def perform(env: Mapping[str, str] | None = None) -> int:
             return 1
         return 0
     except (ScanError, OSError, UnicodeError, ValueError, json.JSONDecodeError) as exc:
-        print(f"clonepeek action: {type(exc).__name__}: {exc}", file=sys.stderr)
+        print(f"clonepeek action: {type(exc).__name__}: {redact(str(exc), 1000)}", file=sys.stderr)
         return 2
 
 

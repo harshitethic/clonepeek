@@ -43,3 +43,27 @@ unknown formats, custom option names, and non-command metadata can still
 contain sensitive values. Review JSON, SARIF, and text reports before
 publishing them or uploading CI artifacts. Run the scanner against untrusted
 repos only from a separate trusted environment.
+
+## Parsing and coverage boundaries
+
+Duplicate JSON keys and non-finite JSON constants produce parse findings;
+ambiguous configurations must not be treated as clean. JSONC supports CR,
+LF and CRLF comments and real trailing commas, not commas in empty collections.
+Baselines use the same 128-level parser nesting limit.
+
+Reaching the directory depth limit with eligible subdirectories returns a scan
+error instead of silently reporting a partial scan. Changed-only scans revisit
+references to deleted tracked shell scripts as well as modified ones.
+
+Script-reference extraction uses the full internal command before evidence
+redaction/truncation; that raw command is excluded from report serialization
+and object representations. Shell backslash continuations are combined for
+heuristic assessment. This is not a shell parser: quoting, generated commands,
+variables and transitive execution remain outside the model.
+
+SARIF paths are URI-encoded. Terminal report paths and error messages have
+control characters removed. Action report output cannot contain line breaks
+or overwrite the input baseline. Reports still require review before sharing.
+
+Lifecycle references: [npm scripts](https://docs.npmjs.com/cli/v11/using-npm/scripts/)
+and [Development Container tools](https://containers.dev/supporting).

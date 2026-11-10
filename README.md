@@ -98,7 +98,7 @@ For integrations, ClonePeek publishes a [versioned JSON report schema](docs/sche
 |---|---|---|---|
 | `.vscode/tasks.json` | `runOptions.runOn: folderOpen` | Editor workspace open/trust settings permit automatic tasks | `vscode-folder-open` |
 | `package.json` | `postinstall`, `prepare`, `prepack` | Supported npm lifecycle events | `npm-lifecycle` |
-| `.devcontainer/devcontainer.json` | `initializeCommand`, `postStartCommand` | Container setup/start/attach events | `devcontainer-lifecycle` |
+| `.devcontainer/devcontainer.json` or `.devcontainer.json` | `initializeCommand`, `postStartCommand` | Container setup/start/attach events | `devcontainer-lifecycle` |
 | Devcontainer features | `features` map | Devcontainer build | `devcontainer-feature` |
 | MCP configuration | `mcpServers.<name>.command` | Agent client starts/approves local MCP process | `mcp-server-process` |
 | Claude Code hooks | `.claude/settings.json` or `.claude/settings.local.json` with `hooks.<event>.*.hooks[].type: command` | Configured Claude Code lifecycle event | `claude-hook-command` |
